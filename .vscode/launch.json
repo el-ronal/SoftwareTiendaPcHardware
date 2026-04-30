@@ -1,0 +1,142 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Debug Eureka",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/eureka",
+      "mainClass": "cl.pchardware.eureka.TiendaEurekaApplication",
+      "projectName": "cl-pchardware-eureka",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-usuarios",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-usuarios",
+      "mainClass": "cl.pchardware.usuarios.TiendaUsuariosApplication",
+      "projectName": "cl-pchardware-usuarios",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-catalogo",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-catalogo",
+      "mainClass": "cl.pchardware.catalogo.TiendaCatalogoApplication",
+      "projectName": "cl-pchardware-catalogo",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-stock",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-stock",
+      "mainClass": "cl.pchardware.stock.TiendaStockApplication",
+      "projectName": "cl-pchardware-stock",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-pedidos",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-pedidos",
+      "mainClass": "cl.pchardware.pedidos.TiendaPedidosApplication",
+      "projectName": "cl-pchardware-pedidos",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-pagos",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-pagos",
+      "mainClass": "cl.pchardware.pagos.TiendaPagosApplication",
+      "projectName": "cl-pchardware-pagos",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-envios",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-envios",
+      "mainClass": "cl.pchardware.envios.TiendaEnviosApplication",
+      "projectName": "cl-pchardware-envios",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-tasacion",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-tasacion",
+      "mainClass": "cl.pchardware.tasacion.TiendaTasacionApplication",
+      "projectName": "cl-pchardware-tasacion",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-garantias",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-garantias",
+      "mainClass": "cl.pchardware.garantias.TiendaGarantiasApplication",
+      "projectName": "cl-pchardware-garantias",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-devoluciones",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-devoluciones",
+      "mainClass": "cl.pchardware.devoluciones.TiendaDevolucionesApplication",
+      "projectName": "cl-pchardware-devoluciones",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-soporte",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-soporte",
+      "mainClass": "cl.pchardware.soporte.TiendaSoporteApplication",
+      "projectName": "cl-pchardware-soporte",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-armado",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-armado",
+      "mainClass": "cl.pchardware.armado.TiendaArmadoApplication",
+      "projectName": "cl-pchardware-armado",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-notificaciones",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-notificaciones",
+      "mainClass": "cl.pchardware.notificaciones.TiendaNotificacionesApplication",
+      "projectName": "cl-pchardware-notificaciones",
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Debug All Services",
+      "configurations": [
+        "Debug Eureka",
+        "Debug ms-usuarios",
+        "Debug ms-catalogo",
+        "Debug ms-stock",
+        "Debug ms-pedidos",
+        "Debug ms-pagos",
+        "Debug ms-envios",
+        "Debug ms-tasacion",
+        "Debug ms-garantias",
+        "Debug ms-devoluciones",
+        "Debug ms-soporte",
+        "Debug ms-armado",
+        "Debug ms-notificaciones"
+      ]
+    }
+  ]
+}
