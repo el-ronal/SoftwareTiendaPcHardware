@@ -3,7 +3,7 @@ Integrantes:
 
 
 
--Ronald Silva
--Andrés Savaria
--Vicente Mitchell
--Adán Valdebenito
+-	Ronald Silva
+-	Andrés Savaria
+-	Vicente Mitchell
+-	Adán Valdebenito
