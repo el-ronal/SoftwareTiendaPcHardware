@@ -1,71 +1,74 @@
 -- 1. Conexión a la base de datos del microservicio
-\c armado
+\c notificaciones
 
 
 -- 2. Eliminación de las tablas en orden jerárquico inverso
-DROP TABLE IF EXISTS resultado_testing;
-DROP TABLE IF EXISTS orden_ensamble;
-DROP TABLE IF EXISTS tecnico_armado;
+DROP TABLE IF EXISTS registro_envio;
+DROP TABLE IF EXISTS mensaje;
+DROP TABLE IF EXISTS plantilla_correo;
 
 
 -- 3. Creación de tablas, relaciones, restricciones e índices
 
 
-CREATE TABLE tecnico_armado (
-    id_tecnico SERIAL PRIMARY KEY,
-    id_usuario INTEGER UNIQUE NOT NULL, -- Referencia externa al MS 'usuarios'
-    especialidad VARCHAR(30) NOT NULL,
-    activo BOOLEAN DEFAULT TRUE,
-    CONSTRAINT chk_especialidad CHECK (especialidad IN ('ESTANDAR', 'REFRIGERACION_LIQUIDA', 'MINI_ITX', 'MODDING'))
+CREATE TABLE plantilla_correo (
+    id_plantilla SERIAL PRIMARY KEY,
+    codigo_evento VARCHAR(30) UNIQUE NOT NULL,
+    asunto VARCHAR(100) NOT NULL,
+    cuerpo_html VARCHAR(255) NOT NULL
 );
 
 
-CREATE TABLE orden_ensamble (
-    id_orden SERIAL PRIMARY KEY,
-    id_pedido INTEGER UNIQUE NOT NULL, -- Referencia externa al MS 'pedidos'
-    id_tecnico INTEGER NOT NULL,
-    estado VARCHAR(20) NOT NULL DEFAULT 'EN_COLA',
-    fecha_inicio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_orden_tecnico FOREIGN KEY (id_tecnico) REFERENCES tecnico_armado (id_tecnico) ON DELETE RESTRICT,
-    CONSTRAINT chk_estado_ensamble CHECK (estado IN ('EN_COLA', 'ENSAMBLANDO', 'TESTEANDO', 'FINALIZADO', 'CANCELADO'))
+CREATE TABLE mensaje (
+    id_mensaje SERIAL PRIMARY KEY,
+    id_usuario INTEGER NOT NULL, -- Referencia externa al MS 'usuarios'
+    id_plantilla INTEGER NOT NULL,
+    estado_mensaje VARCHAR(20) NOT NULL DEFAULT 'PENDIENTE',
+    fecha_generacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_mensaje_plantilla FOREIGN KEY (id_plantilla) REFERENCES plantilla_correo (id_plantilla) ON DELETE RESTRICT,
+    CONSTRAINT chk_estado_mensaje CHECK (estado_mensaje IN ('PENDIENTE', 'PROCESANDO', 'ENVIADO', 'FALLIDO'))
 );
 
 
--- Índices para gestionar la carga de trabajo del taller
-CREATE INDEX idx_orden_estado ON orden_ensamble(estado);
-CREATE INDEX idx_orden_tecnico ON orden_ensamble(id_tecnico);
+-- Índices para que el worker de envíos (cron/scheduler) encuentre rápido los pendientes
+CREATE INDEX idx_mensaje_estado ON mensaje(estado_mensaje);
+CREATE INDEX idx_mensaje_usuario ON mensaje(id_usuario);
 
 
-CREATE TABLE resultado_testing (
-    id_resultado SERIAL PRIMARY KEY,
-    id_orden INTEGER UNIQUE NOT NULL,
-    temp_max_cpu INTEGER NOT NULL,
-    puntaje_benchmark INTEGER,
-    aprobado BOOLEAN NOT NULL,
-    CONSTRAINT fk_resultado_orden FOREIGN KEY (id_orden) REFERENCES orden_ensamble (id_orden) ON DELETE CASCADE,
-    CONSTRAINT chk_temperatura_cpu CHECK (temp_max_cpu BETWEEN 20 AND 110)
+CREATE TABLE registro_envio (
+    id_registro SERIAL PRIMARY KEY,
+    id_mensaje INTEGER NOT NULL,
+    proveedor_smtp VARCHAR(30) NOT NULL,
+    intentos INTEGER NOT NULL DEFAULT 1,
+    fecha_ultimo_intento TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_registro_mensaje FOREIGN KEY (id_mensaje) REFERENCES mensaje (id_mensaje) ON DELETE CASCADE,
+    CONSTRAINT chk_intentos_validos CHECK (intentos BETWEEN 1 AND 3)
 );
 
 
 -- 4. Poblado de tablas con datos de prueba (Casos base y bordes)
 
 
--- TECNICO_ARMADO: Personal capacitado para ensamblar los equipos
-INSERT INTO tecnico_armado (id_usuario, especialidad, activo) VALUES
-(4, 'ESTANDAR', TRUE), -- Caso base: Técnico para armados tradicionales
-(6, 'REFRIGERACION_LIQUIDA', TRUE), -- Caso base: Especialista en custom loops
-(7, 'MINI_ITX', FALSE); -- Caso borde: Técnico inactivo (vacaciones/licencia)
+-- PLANTILLA_CORREO: Textos predefinidos para los eventos del sistema
+INSERT INTO plantilla_correo (codigo_evento, asunto, cuerpo_html) VALUES
+('BIENVENIDA', '¡Bienvenido a PCHardware!', '<h1>Hola, gracias por registrarte.</h1>'),
+('PEDIDO_PAGADO', 'Tu pago ha sido aprobado', '<h1>Recibimos tu pago. Preparando orden...</h1>'),
+('ENVIO_DESPACHADO', 'Tu PC va en camino', '<h1>Tu pedido ha sido entregado al courier.</h1>'),
+('ALERTA_SEGURIDAD', 'Intento de inicio de sesión', '<h1>Detectamos un acceso inusual.</h1>');
 
 
--- ORDEN_ENSAMBLE: Solicitudes de armado vinculadas a pedidos pagados
-INSERT INTO orden_ensamble (id_pedido, id_tecnico, estado) VALUES
-(1, 1, 'FINALIZADO'), -- Caso base: PC armado y entregado
-(2, 2, 'TESTEANDO'), -- Caso base: PC de gama alta con refrigeración líquida en pruebas de estrés
-(3, 1, 'EN_COLA'), -- Caso base: Esperando turno en el mesón de trabajo
-(4, 2, 'CANCELADO'); -- Caso borde: Cliente se arrepintió del servicio de armado antes de empezar
+-- MENSAJE: Cola de notificaciones gatilladas por otros microservicios vía Kafka/RabbitMQ
+INSERT INTO mensaje (id_usuario, id_plantilla, estado_mensaje) VALUES
+(2, 1, 'ENVIADO'),      -- Caso base: Correo de bienvenida histórico
+(2, 2, 'ENVIADO'),      -- Caso base: Confirmación de compra enviada con éxito
+(4, 3, 'PENDIENTE'),    -- Caso base: Recién encolado, esperando al worker de correos
+(5, 4, 'FALLIDO'),      -- Caso borde: Correo rebotó (posiblemente la cuenta "correo.raro" dada de baja)
+(3, 2, 'PROCESANDO');   -- Caso base: Worker actualmente intentando enviar el correo
 
 
--- RESULTADO_TESTING: Métricas de las pruebas de estrés (FurMark, Cinebench, etc.)
-INSERT INTO resultado_testing (id_orden, temp_max_cpu, puntaje_benchmark, aprobado) VALUES
-(1, 75, 14500, TRUE), -- Caso base: Temperaturas normales, aprueba control de calidad
-(2, 98, 32000, FALSE); -- Caso borde: PC de gama alta con thermal throttling, reprueba testing y vuelve a ensamblaje
+-- REGISTRO_ENVIO: Trazabilidad de los intentos a través del proveedor (ej. SendGrid, Amazon SES)
+INSERT INTO registro_envio (id_mensaje, proveedor_smtp, intentos) VALUES
+(1, 'AMAZON_SES', 1),   -- Caso base: Salió al primer intento
+(2, 'AMAZON_SES', 1),   -- Caso base: Salió al primer intento
+(4, 'SENDGRID', 3),     -- Caso borde: Alcanzó el máximo de 3 reintentos permitidos por el CHECK y falló definitivamente
+(5, 'AMAZON_SES', 2);   -- Caso borde: Falló el primer intento por timeout, en su segundo intento actual
