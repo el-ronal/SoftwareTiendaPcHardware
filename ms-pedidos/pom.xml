@@ -65,7 +65,6 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>${com-h2database.version}</version>
         </dependency>
 
         <!-- Validacion con anotaciones como @Valid, @NotNull, etc. -->
@@ -119,6 +118,13 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- Modulo Common: excepciones globales y handler compartido -->
+        <dependency>
+            <groupId>cl.pchardware</groupId>
+            <artifactId>cl-pchardware-common</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
     </dependencies>
 
     <!-- Empaquetado ejecutable con Spring Boot -->
@@ -163,5 +169,5 @@
             </plugin>
         </plugins>
     </build>
-
+    
 </project>
