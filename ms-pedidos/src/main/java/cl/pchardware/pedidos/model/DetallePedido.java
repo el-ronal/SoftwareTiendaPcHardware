@@ -1,10 +1,9 @@
 package cl.pchardware.pedidos.model;
 
-import java.util.Objects;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -18,10 +17,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+
+
 @Entity
-@Table(name = "detalle_pedido", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"id_pedido", "sku_producto"})
-})
+@Table(
+    name = "detalle_pedido",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uq_pedido_sku", columnNames = {"id_pedido", "sku_producto"})
+    }
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -31,11 +35,11 @@ public class DetallePedido {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_detalle")
-    private Integer idDetalle;
+    @Column(name = "id_detalle", nullable = false)
+    private Long idDetalle;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_pedido", nullable = false)
+    @JoinColumn(name = "id_pedido", nullable = false, foreignKey = @ForeignKey(name = "fk_detalle_pedido"))
     private Pedido pedido;
 
     @Column(name = "sku_producto", nullable = false, length = 30)
@@ -52,11 +56,11 @@ public class DetallePedido {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DetallePedido that = (DetallePedido) o;
-        return Objects.equals(idDetalle, that.idDetalle);
+        return idDetalle != null && idDetalle.equals(that.idDetalle);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idDetalle);
+        return getClass().hashCode();
     }
 }

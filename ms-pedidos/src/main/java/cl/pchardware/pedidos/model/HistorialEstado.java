@@ -1,7 +1,6 @@
 package cl.pchardware.pedidos.model;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -10,6 +9,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,21 +24,21 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "historial_estado")
+@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EntityListeners(AuditingEntityListener.class)
 public class HistorialEstado {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_historial")
-    private Integer idHistorial;
+    @Column(name = "id_historial", nullable = false)
+    private Long idHistorial;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_pedido", nullable = false)
+    @JoinColumn(name = "id_pedido", nullable = false, foreignKey = @ForeignKey(name = "fk_historial_pedido"))
     private Pedido pedido;
 
     @Column(name = "estado_anterior", length = 20)
@@ -48,7 +48,7 @@ public class HistorialEstado {
     private String estadoNuevo;
 
     @CreatedDate
-    @Column(name = "fecha_cambio", updatable = false)
+    @Column(name = "fecha_cambio", nullable = false, updatable = false)
     private LocalDateTime fechaCambio;
 
     @Override
@@ -56,11 +56,11 @@ public class HistorialEstado {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         HistorialEstado that = (HistorialEstado) o;
-        return Objects.equals(idHistorial, that.idHistorial);
+        return idHistorial != null && idHistorial.equals(that.idHistorial);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idHistorial);
+        return getClass().hashCode();
     }
 }
