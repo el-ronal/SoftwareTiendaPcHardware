@@ -1,15 +1,23 @@
 package cl.pchardware.envios.model;
 
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.util.List;
 import java.util.Objects;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 @Entity
-@Table(name = "courier", uniqueConstraints = {
-    @UniqueConstraint(columnNames = "codigo")
-})
+@Table(name = "courier")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,10 +27,10 @@ public class Courier {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_courier")
+    @Column(name = "id_courier", nullable = false)
     private Integer idCourier;
 
-    @Column(name = "codigo", nullable = false, length = 15)
+    @Column(name = "codigo", nullable = false, unique = true, length = 15)
     private String codigo;
 
     @Column(name = "nombre_empresa", nullable = false, length = 50)

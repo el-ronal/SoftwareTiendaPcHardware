@@ -1,9 +1,22 @@
 package cl.pchardware.pagos.model;
-
-import jakarta.persistence.*;
-import lombok.*;
-
-import java.util.Objects;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "transaccion")
@@ -29,22 +42,27 @@ public class Transaccion {
     @Column(name = "monto_clp", nullable = false)
     private Integer montoClp;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false, length = 20)
-    private String estado;
+    private EstadoTransaccion estado;
 
     @OneToOne(mappedBy = "transaccion", cascade = CascadeType.ALL)
     private Reembolso reembolso;
+
+    public enum EstadoTransaccion {
+        PENDIENTE, APROBADA, RECHAZADA, REEMBOLSADA
+    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Transaccion that = (Transaccion) o;
-        return Objects.equals(idTransaccion, that.idTransaccion);
+        return idTransaccion != null && idTransaccion.equals(that.idTransaccion);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idTransaccion);
+        return getClass().hashCode();
     }
 }

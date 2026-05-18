@@ -29,6 +29,7 @@
         <module>ms-soporte</module>      <!-- Microservicio soporte -->
         <module>ms-armado</module>      <!-- Microservicio armado -->
         <module>ms-notificaciones</module>      <!-- Microservicio notificaciones -->
+        <module>common</module>
         <!-- CGV: Agrega aqui mas modulos segun sea necesario -->
     </modules>
 
@@ -68,6 +69,7 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <maven-clean-plugin.version>3.3.1</maven-clean-plugin.version>
+        <cl-pchardware-common.version>0.0.1-SNAPSHOT</cl-pchardware-common.version>
     </properties>
 
     <dependencyManagement>
@@ -136,6 +138,13 @@
                 <artifactId>jakarta.el</artifactId>
                 <version>${jakarta.el.version}</version>
             </dependency>
+            
+        <!-- Modulo Common: excepciones globales y handler compartido -->
+        <dependency>
+            <groupId>cl.pchardware</groupId>
+            <artifactId>cl-pchardware-common</artifactId>
+            <version>${cl-pchardware-common.version}</version>
+        </dependency>
 
         </dependencies>
     </dependencyManagement>
