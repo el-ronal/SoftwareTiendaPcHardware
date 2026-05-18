@@ -1,7 +1,6 @@
 package cl.pchardware.pagos.model;
 
 import java.util.List;
-import java.util.Objects;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,7 +18,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "metodo_pago", uniqueConstraints = {
-    @UniqueConstraint(columnNames = "codigo")
+        @UniqueConstraint(columnNames = "codigo")
 })
 @Getter
 @Setter
@@ -33,7 +32,7 @@ public class MetodoPago {
     @Column(name = "id_metodo")
     private Integer idMetodo;
 
-    @Column(name = "codigo", nullable = false, length = 20)
+    @Column(name = "codigo", nullable = false, unique = true, length = 20)
     private String codigo;
 
     @Column(name = "nombre", nullable = false, length = 50)
@@ -48,14 +47,16 @@ public class MetodoPago {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         MetodoPago that = (MetodoPago) o;
-        return Objects.equals(idMetodo, that.idMetodo);
+        return idMetodo != null && idMetodo.equals(that.idMetodo);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idMetodo);
+        return getClass().hashCode();
     }
 }

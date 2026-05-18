@@ -2,7 +2,6 @@ package cl.pchardware.envios.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.util.List;
 import java.util.Objects;
 
@@ -17,7 +16,7 @@ public class DireccionEnvio {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_direccion")
+    @Column(name = "id_direccion", nullable = false)
     private Integer idDireccion;
 
     @Column(name = "id_pedido", nullable = false, unique = true)

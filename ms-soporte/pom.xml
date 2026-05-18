@@ -65,7 +65,6 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>${com-h2database.version}</version>
         </dependency>
 
         <!-- Validacion con anotaciones como @Valid, @NotNull, etc. -->
