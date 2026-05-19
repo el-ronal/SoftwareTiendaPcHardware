@@ -1,5 +1,4 @@
 package cl.pchardware.tasacion.model;
-
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -19,15 +18,6 @@ import java.util.Objects;
 @AllArgsConstructor
 @Builder
 public class OfertaCompra {
-
-    public enum EstadoOferta {
-
-        ENVIADA,
-        ACEPTADA,
-        RECHAZADA_CLIENTE,
-        CADUCADA
-
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,10 +41,8 @@ public class OfertaCompra {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         OfertaCompra that = (OfertaCompra) o;
         return idOferta != null && Objects.equals(idOferta, that.idOferta);
     }
