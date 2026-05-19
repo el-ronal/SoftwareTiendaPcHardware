@@ -17,6 +17,13 @@ import java.util.Objects;
 @Builder
 public class Movimiento {
 
+    public enum TipoMovimiento {
+
+        ENTRADA,
+        SALIDA,
+        AJUSTE
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_movimiento", nullable = false)
