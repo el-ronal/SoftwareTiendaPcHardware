@@ -1,8 +1,8 @@
 package cl.pchardware.stock.mapper;
 
-import cl.pchardware.dto.InventarioRequest;
-import cl.pchardware.dto.InventarioResponse;
-import cl.pchardware.model.Inventario;
+import cl.pchardware.stock.dto.InventarioRequest;
+import cl.pchardware.stock.dto.InventarioResponse;
+import cl.pchardware.stock.model.Inventario;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

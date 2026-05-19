@@ -1,7 +1,7 @@
 // BodegaRepository.java
 package cl.pchardware.stock.repository;
 
-import cl.pchardware.model.Bodega;
+import cl.pchardware.stock.model.Bodega;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

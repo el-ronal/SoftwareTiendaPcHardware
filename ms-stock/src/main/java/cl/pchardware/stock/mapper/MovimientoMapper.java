@@ -1,8 +1,8 @@
 package cl.pchardware.stock.mapper;
 
-import cl.pchardware.dto.MovimientoRequest;
-import cl.pchardware.dto.MovimientoResponse;
-import cl.pchardware.model.Movimiento;
+import cl.pchardware.stock.dto.MovimientoRequest;
+import cl.pchardware.stock.dto.MovimientoResponse;
+import cl.pchardware.stock.model.Movimiento;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

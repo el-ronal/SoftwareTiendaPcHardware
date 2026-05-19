@@ -1,8 +1,8 @@
 package cl.pchardware.stock.mapper;
 
-import cl.pchardware.dto.BodegaRequest;
-import cl.pchardware.dto.BodegaResponse;
-import cl.pchardware.model.Bodega;
+import cl.pchardware.stock.dto.BodegaRequest;
+import cl.pchardware.stock.dto.BodegaResponse;
+import cl.pchardware.stock.model.Bodega;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

@@ -1,7 +1,7 @@
 // InventarioRepository.java
 package cl.pchardware.stock.repository;
 
-import cl.pchardware.model.Inventario;
+import cl.pchardware.stock.model.Inventario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

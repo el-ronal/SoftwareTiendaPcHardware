@@ -4,20 +4,20 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import cl.pchardware.dto.InventarioRequest;
-import cl.pchardware.dto.InventarioResponse;
-import cl.pchardware.dto.MovimientoRequest;
-import cl.pchardware.dto.MovimientoResponse;
-import cl.pchardware.mapper.InventarioMapper;
-import cl.pchardware.mapper.MovimientoMapper;
-import cl.pchardware.model.Bodega;
-import cl.pchardware.model.Inventario;
-import cl.pchardware.model.Movimiento;
-import cl.pchardware.repository.BodegaRepository;
-import cl.pchardware.repository.InventarioRepository;
-import cl.pchardware.repository.MovimientoRepository;
-import cl.triskeledu.common.exception.DuplicateResourceException;
-import cl.triskeledu.common.exception.EntityNotFoundException;
+import cl.pchardware.stock.dto.InventarioRequest;
+import cl.pchardware.stock.dto.InventarioResponse;
+import cl.pchardware.stock.dto.MovimientoRequest;
+import cl.pchardware.stock.dto.MovimientoResponse;
+import cl.pchardware.stock.mapper.InventarioMapper;
+import cl.pchardware.stock.mapper.MovimientoMapper;
+import cl.pchardware.stock.model.Bodega;
+import cl.pchardware.stock.model.Inventario;
+import cl.pchardware.stock.model.Movimiento;
+import cl.pchardware.stock.repository.BodegaRepository;
+import cl.pchardware.stock.repository.InventarioRepository;
+import cl.pchardware.stock.repository.MovimientoRepository;
+import cl.pchardware.common.exception.DuplicateResourceException;
+import cl.pchardware.common.exception.EntityNotFoundException;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

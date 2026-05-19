@@ -1,7 +1,7 @@
 // MovimientoRepository.java
 package cl.pchardware.stock.repository;
 
-import cl.pchardware.model.Movimiento;
+import cl.pchardware.stock.model.Movimiento;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
