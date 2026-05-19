@@ -13,6 +13,12 @@ import java.util.Objects;
 @AllArgsConstructor
 @Builder
 public class Bodega {
+ 
+    public enum TipoBodega {
+        NUEVOS,   // corregido (antes era NUEVO)
+        USADOS,   // corregido (antes era USADO)
+        MERMA
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
