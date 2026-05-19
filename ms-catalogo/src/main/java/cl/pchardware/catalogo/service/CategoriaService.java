@@ -1,6 +1,7 @@
 package cl.pchardware.catalogo.service;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +38,8 @@ public class CategoriaService {
         if (categoriaRepository.existsBySlug(request.getSlug())) {
             throw new DuplicateResourceException("Categoría", "slug", request.getSlug(), request.getNombre());
         }
-        return categoriaMapper.toResponse(categoriaRepository.save(categoriaMapper.toEntity(request)));
+        Categoria categoria = Objects.requireNonNull(categoriaMapper.toEntity(request), "La categoría no puede ser nula");
+        return categoriaMapper.toResponse(categoriaRepository.save(categoria));
     }
 
     @Transactional
