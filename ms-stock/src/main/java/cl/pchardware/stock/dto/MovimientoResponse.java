@@ -1,15 +1,11 @@
 package cl.pchardware.stock.dto;
 
-import java.time.LocalDateTime;
-
 import lombok.Data;
+import java.time.LocalDateTime;
 
 @Data
 public class MovimientoResponse {
-
-    private Integer idMovimiento;
-    private Integer idInventario;
-    private String skuProducto;
+    private Long idMovimiento;
     private String tipoMovimiento;
     private Integer cantidadVariacion;
     private LocalDateTime fechaRegistro;

@@ -1,19 +1,16 @@
+// InventarioRepository.java
 package cl.pchardware.stock.repository;
+
+import cl.pchardware.model.Inventario;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
-import cl.pchardware.stock.model.Inventario;
-
 @Repository
-public interface InventarioRepository extends JpaRepository<Inventario, Integer> {
-
+public interface InventarioRepository extends JpaRepository<Inventario, Long> {
     List<Inventario> findBySkuProducto(String skuProducto);
-
-    List<Inventario> findByBodega_IdBodega(Integer idBodega);
-
-    Optional<Inventario> findByBodega_IdBodegaAndSkuProducto(Integer idBodega, String skuProducto);
+    Optional<Inventario> findByBodegaCodigoAndSkuProducto(String codigoBodega, String skuProducto);
+    boolean existsByBodegaCodigoAndSkuProducto(String codigoBodega, String skuProducto);
 }

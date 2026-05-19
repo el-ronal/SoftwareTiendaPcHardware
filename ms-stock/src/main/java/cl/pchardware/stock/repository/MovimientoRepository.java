@@ -1,14 +1,13 @@
+// MovimientoRepository.java
 package cl.pchardware.stock.repository;
 
-import java.util.List;
-
+import cl.pchardware.model.Movimiento;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import cl.pchardware.stock.model.Movimiento;
+import java.util.List;
 
 @Repository
-public interface MovimientoRepository extends JpaRepository<Movimiento, Integer> {
-
-    List<Movimiento> findByInventario_IdInventario(Integer idInventario);
+public interface MovimientoRepository extends JpaRepository<Movimiento, Long> {
+    List<Movimiento> findByInventarioIdInventarioOrderByFechaRegistroDesc(Long idInventario);
 }

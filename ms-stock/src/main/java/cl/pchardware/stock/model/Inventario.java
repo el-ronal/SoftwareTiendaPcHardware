@@ -1,14 +1,22 @@
+// Inventario.java
 package cl.pchardware.stock.model;
+
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
-@Table(name = "inventario", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"id_bodega", "sku_producto"})
-})
+@Table(
+    name = "inventario",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uq_bodega_sku", columnNames = {"id_bodega", "sku_producto"})
+    },
+    indexes = {
+        @Index(name = "idx_inventario_sku", columnList = "sku_producto")
+    }
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,10 +27,10 @@ public class Inventario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_inventario", nullable = false)
-    private Integer idInventario;
+    private Long idInventario;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_bodega", referencedColumnName = "id_bodega", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "id_bodega", nullable = false)
     private Bodega bodega;
 
     @Column(name = "sku_producto", nullable = false, length = 30)
@@ -31,15 +39,16 @@ public class Inventario {
     @Column(name = "cantidad", nullable = false)
     private Integer cantidad;
 
-    @OneToMany(mappedBy = "inventario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Movimiento> movimientos;
+    @Builder.Default
+    @OneToMany(mappedBy = "inventario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Movimiento> movimientos = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Inventario that = (Inventario) o;
-        return idInventario != null && Objects.equals(idInventario, that.idInventario);
+        Inventario inventario = (Inventario) o;
+        return idInventario != null && idInventario.equals(inventario.idInventario);
     }
 
     @Override
