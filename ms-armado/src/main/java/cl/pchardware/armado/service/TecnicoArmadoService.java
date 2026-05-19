@@ -1,6 +1,7 @@
 package cl.pchardware.armado.service;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,12 +38,13 @@ public class TecnicoArmadoService {
         tecnicoRepository.findByIdUsuario(request.getIdUsuario())
                 .ifPresent(t -> { throw new DuplicateResourceException("TecnicoArmado", "idUsuario",
                         request.getIdUsuario(), "usuario " + request.getIdUsuario()); });
-        return tecnicoMapper.toResponse(tecnicoRepository.save(tecnicoMapper.toEntity(request)));
+        TecnicoArmado tecnico = Objects.requireNonNull(tecnicoMapper.toEntity(request), "El técnico de armado no puede ser nulo");
+        return tecnicoMapper.toResponse(tecnicoRepository.save(tecnico));
     }
 
     @Transactional
     public TecnicoArmadoResponse update(Integer id, TecnicoArmadoRequest request) {
-        TecnicoArmado tecnico = getTecnicoById(id);
+        TecnicoArmado tecnico = Objects.requireNonNull(getTecnicoById(id), "No se encontró el técnico de armado con ID: " + id);
         tecnicoMapper.updateEntity(request, tecnico);
         return tecnicoMapper.toResponse(tecnicoRepository.save(tecnico));
     }
@@ -57,7 +59,8 @@ public class TecnicoArmadoService {
     }
 
     private TecnicoArmado getTecnicoById(Integer id) {
-        return tecnicoRepository.findById(id)
+        Integer idTecnico = Objects.requireNonNull(id, "El ID del técnico de armado es obligatorio");
+        return tecnicoRepository.findById(idTecnico)
                 .orElseThrow(() -> new EntityNotFoundException("TecnicoArmado", "ID", id));
     }
 }

@@ -1,6 +1,7 @@
 package cl.pchardware.armado.service;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,7 +45,8 @@ public class OrdenEnsambleService {
         ordenRepository.findByIdPedido(request.getIdPedido())
                 .ifPresent(o -> { throw new DuplicateResourceException("OrdenEnsamble", "idPedido",
                         request.getIdPedido(), "pedido " + request.getIdPedido()); });
-        TecnicoArmado tecnico = tecnicoRepository.findById(request.getIdTecnico())
+        Integer idTecnico = Objects.requireNonNull(request.getIdTecnico(), "El Id del técnico es obligatorio");
+        TecnicoArmado tecnico = tecnicoRepository.findById(idTecnico)
                 .orElseThrow(() -> new EntityNotFoundException("TecnicoArmado", "ID", request.getIdTecnico()));
         OrdenEnsamble orden = ordenMapper.toEntity(request);
         orden.setTecnico(tecnico);
@@ -54,7 +56,8 @@ public class OrdenEnsambleService {
     @Transactional
     public OrdenEnsambleResponse update(Integer id, OrdenEnsambleRequest request) {
         OrdenEnsamble orden = getOrdenById(id);
-        TecnicoArmado tecnico = tecnicoRepository.findById(request.getIdTecnico())
+        Integer idTecnico = Objects.requireNonNull(request.getIdTecnico(), "El Id del técnico es obligatorio");    
+        TecnicoArmado tecnico = tecnicoRepository.findById(idTecnico)
                 .orElseThrow(() -> new EntityNotFoundException("TecnicoArmado", "ID", request.getIdTecnico()));
         ordenMapper.updateEntity(request, orden);
         orden.setTecnico(tecnico);
@@ -63,11 +66,13 @@ public class OrdenEnsambleService {
 
     @Transactional
     public void deleteById(Integer id) {
-        ordenRepository.delete(getOrdenById(id));
+        OrdenEnsamble orden = Objects.requireNonNull(getOrdenById(id), "No se encontró la orden de ensamble con ID: " + id);
+        ordenRepository.delete(orden);
     }
 
     private OrdenEnsamble getOrdenById(Integer id) {
-        return ordenRepository.findById(id)
+        Integer idOrden = Objects.requireNonNull(id, "El ID de la orden de ensamble es obligatorio");
+        return ordenRepository.findById(idOrden)
                 .orElseThrow(() -> new EntityNotFoundException("OrdenEnsamble", "ID", id));
     }
 }
