@@ -4,10 +4,11 @@ import lombok.Data;
 
 @Data
 public class UsuarioResponse {
-
-    private Integer idUsuario;
-    private Integer idRol;
-    private String nombreRol;
+    private Long idUsuario;
     private String email;
     private String estado;
+    
+    // Respuestas anidadas que MapStruct llenará automáticamente
+    private RolResponse rol;
+    private PerfilResponse perfil;
 }

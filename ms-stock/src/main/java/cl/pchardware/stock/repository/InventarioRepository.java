@@ -11,6 +11,6 @@ import java.util.Optional;
 @Repository
 public interface InventarioRepository extends JpaRepository<Inventario, Long> {
     List<Inventario> findBySkuProducto(String skuProducto);
-    Optional<Inventario> findByBodegaCodigoAndSkuProducto(String codigoBodega, String skuProducto);
-    boolean existsByBodegaCodigoAndSkuProducto(String codigoBodega, String skuProducto);
+    Optional<Inventario> findByBodegaIdAndSkuProducto(Long idBodega, String skuProducto);
+    boolean existsByBodegaCodigoAndSkuProducto(String codigoBodega, String skuProducto); //comentar en un futuro para validar antes de insertar
 }

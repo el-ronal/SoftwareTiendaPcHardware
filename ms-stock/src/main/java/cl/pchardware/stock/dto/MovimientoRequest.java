@@ -7,6 +7,9 @@ import lombok.Data;
 
 @Data
 public class MovimientoRequest {
+    @NotNull(message = "El ID del inventario es obligatorio")
+    private Long idInventario;
+    
     @NotBlank(message = "El tipo de movimiento es obligatorio")
     @Pattern(regexp = "ENTRADA|SALIDA|AJUSTE", message = "El tipo debe ser ENTRADA, SALIDA o AJUSTE")
     private String tipoMovimiento;

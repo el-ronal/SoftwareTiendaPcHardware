@@ -1,21 +1,20 @@
 package cl.pchardware.usuarios.repository;
 
-import java.util.List;
-import java.util.Optional;
-
+import cl.pchardware.usuarios.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import cl.pchardware.usuarios.model.Usuario;
+import java.util.Optional;
 
 @Repository
-public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
-
+public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+    
+    // Aprovecha la restricción UNIQUE del campo 'email'
     Optional<Usuario> findByEmail(String email);
-
-    boolean existsByEmail(String email);
-
-    List<Usuario> findByEstado(Usuario.EstadoUsuario estado);
-
-    List<Usuario> findByRol_IdRol(Integer idRol);
+    
+    // Útil para validaciones rápidas al registrar un usuario
+    // boolean existsByEmail(String email);
+    
+    // Aprovecha el índice 'idx_usuario_estado' que creaste en el script SQL
+    // List<Usuario> findByEstado(String estado);
 }

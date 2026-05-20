@@ -2,21 +2,15 @@ package cl.pchardware.usuarios.controller;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import cl.pchardware.usuarios.dto.RolRequest;
 import cl.pchardware.usuarios.dto.RolResponse;
+import cl.pchardware.usuarios.mapper.RolMapper;
 import cl.pchardware.usuarios.service.RolService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -25,30 +19,16 @@ import lombok.RequiredArgsConstructor;
 public class RolController {
 
     private final RolService rolService;
+    private final RolMapper rolMapper;
 
     @GetMapping
     public ResponseEntity<List<RolResponse>> findAll() {
-        return ResponseEntity.ok(rolService.findAll());
+        // Obtenemos las entidades del Service y las mapeamos a Response aquí en el Controller
+        return ResponseEntity.ok(rolMapper.toResponseList(rolService.findAll()));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<RolResponse> findById(@PathVariable Integer id) {
-        return ResponseEntity.ok(rolService.findById(id));
-    }
-
-    @PostMapping
-    public ResponseEntity<RolResponse> create(@Valid @RequestBody RolRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(rolService.create(request));
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<RolResponse> update(@PathVariable Integer id, @Valid @RequestBody RolRequest request) {
-        return ResponseEntity.ok(rolService.update(id, request));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteById(@PathVariable Integer id) {
-        rolService.deleteById(id);
-        return ResponseEntity.noContent().build();
+    @GetMapping("/{nombre}")
+    public ResponseEntity<RolResponse> findByNombre(@PathVariable String nombre) {
+        return ResponseEntity.ok(rolMapper.toResponse(rolService.getRolByNombre(nombre)));
     }
 }

@@ -10,10 +10,10 @@ import lombok.Data;
 public class ProductoRequest {
 
     @NotNull(message = "El ID de marca es obligatorio")
-    private Integer idMarca;
+    private String codigoMarca;
 
     @NotNull(message = "El ID de categoría es obligatorio")
-    private Integer idCategoria;
+    private String slugCategoria;
 
     @NotBlank(message = "El SKU es obligatorio")
     @Size(max = 30, message = "El SKU no puede superar los 30 caracteres")
