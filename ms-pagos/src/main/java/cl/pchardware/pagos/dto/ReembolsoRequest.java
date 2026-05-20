@@ -6,13 +6,15 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
-@Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ReembolsoRequest {
 
     @NotNull(message = "El ID de la transacción es obligatorio")
@@ -22,7 +24,7 @@ public class ReembolsoRequest {
     @Min(value = 1, message = "El monto de devolución debe ser mayor a 0")
     private Integer montoDevolucion;
 
-    @NotBlank(message = "El motivo es obligatorio")
+    @NotBlank(message = "El motivo del reembolso es obligatorio")
     @Size(max = 100, message = "El motivo no puede superar los 100 caracteres")
     private String motivo;
 }

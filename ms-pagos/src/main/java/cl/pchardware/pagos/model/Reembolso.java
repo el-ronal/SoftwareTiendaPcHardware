@@ -1,15 +1,13 @@
 package cl.pchardware.pagos.model;
 
 import lombok.*;
-import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "reembolso", uniqueConstraints = {
-    @UniqueConstraint(columnNames = "id_transaccion")
-})
+@Table(name = "reembolso")
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
@@ -20,11 +18,11 @@ public class Reembolso {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_reembolso")
+    @Column(name = "id_reembolso", nullable = false)
     private Integer idReembolso;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_transaccion", nullable = false, unique = true)
+    @JoinColumn(name = "id_transaccion", nullable = false, unique = true, foreignKey = @ForeignKey(name = "fk_reembolso_transaccion"))
     private Transaccion transaccion;
 
     @Column(name = "monto_devolucion", nullable = false)

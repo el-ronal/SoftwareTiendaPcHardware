@@ -1,9 +1,8 @@
 package cl.pchardware.envios.model;
 
-import jakarta.persistence.*;
 import lombok.*;
+import jakarta.persistence.*;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Table(name = "direccion_envio")
@@ -31,7 +30,7 @@ public class DireccionEnvio {
     @Column(name = "region", nullable = false, length = 50)
     private String region;
 
-    @OneToMany(mappedBy = "direccionEnvio")
+    @OneToMany(mappedBy = "direccionEnvio", cascade = CascadeType.ALL)
     private List<Despacho> despachos;
 
     @Override
@@ -39,11 +38,11 @@ public class DireccionEnvio {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DireccionEnvio that = (DireccionEnvio) o;
-        return Objects.equals(idDireccion, that.idDireccion);
+        return idDireccion != null && idDireccion.equals(that.idDireccion);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idDireccion);
+        return getClass().hashCode();
     }
 }

@@ -16,11 +16,11 @@ import lombok.Setter;
 @Builder
 public class DireccionEnvioRequest {
 
-    @NotNull(message = "El ID de pedido es obligatorio")
+    @NotNull(message = "El ID del pedido es obligatorio")
     private Integer idPedido;
 
     @NotBlank(message = "La calle y número son obligatorios")
-    @Size(max = 100, message = "La calle y número no pueden superar los 100 caracteres")
+    @Size(max = 100, message = "La dirección no puede superar los 100 caracteres")
     private String calleNumero;
 
     @NotBlank(message = "La comuna es obligatoria")

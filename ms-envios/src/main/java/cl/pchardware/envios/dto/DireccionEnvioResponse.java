@@ -12,6 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class DireccionEnvioResponse {
+
     private Integer idDireccion;
     private Integer idPedido;
     private String calleNumero;

@@ -1,18 +1,24 @@
 package cl.pchardware.pedidos.dto;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-import lombok.Data;
+import cl.pchardware.pedidos.model.Pedido;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class PedidoResponse {
-    private Long idPedido;
+
+    private Integer idPedido;
     private Integer idUsuario;
     private LocalDateTime fechaCreacion;
-    private String estado;
+    private Pedido.EstadoPedido estado;
     private Integer totalClp;
-    
-    private List<DetallePedidoResponse> detalles;
-    private List<HistorialEstadoResponse> historialEstados;
 }

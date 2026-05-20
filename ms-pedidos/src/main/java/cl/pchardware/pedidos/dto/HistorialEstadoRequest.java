@@ -1,16 +1,25 @@
 package cl.pchardware.pedidos.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-import lombok.Data;
+import cl.pchardware.pedidos.model.Pedido;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class HistorialEstadoRequest {
 
-    @Size(max = 20, message = "El estado anterior no puede superar los 20 caracteres")
-    private String estadoAnterior;
+    @NotNull(message = "El ID del pedido es obligatorio")
+    private Integer idPedido;
 
-    @NotBlank(message = "El estado nuevo es obligatorio")
-    @Size(max = 20, message = "El estado nuevo no puede superar los 20 caracteres")
-    private String estadoNuevo;
+    private Pedido.EstadoPedido estadoAnterior;
+
+    @NotNull(message = "El estado nuevo es obligatorio")
+    private Pedido.EstadoPedido estadoNuevo;
 }
