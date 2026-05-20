@@ -1,6 +1,8 @@
 package cl.pchardware.usuarios.service;
 
 import java.util.List;
+import java.util.Objects;
+
 import org.springframework.stereotype.Service;
 
 import cl.pchardware.usuarios.dto.UsuarioRequest;
@@ -30,7 +32,7 @@ public class UsuarioService {
         return usuarioMapper.toResponseList(usuarioRepository.findAll());
     }
 
-    public UsuarioResponse findById(long id) {
+    public UsuarioResponse findById(Long id) {
         return usuarioMapper.toResponse(getUsuarioById(id));
     }
 
@@ -54,7 +56,7 @@ public class UsuarioService {
     }
 
     @Transactional
-    public UsuarioResponse update(long id, UsuarioRequest request) {
+    public UsuarioResponse update(Long id, UsuarioRequest request) {
         Usuario usuario = getUsuarioById(id);
 
         if (!usuario.getEmail().equalsIgnoreCase(request.getEmail())) {
@@ -78,13 +80,16 @@ public class UsuarioService {
     }
 
     @Transactional
-    public void deleteById(long id) {
+    public void deleteById(Long id) {
         Usuario usuario = getUsuarioById(id);
-        usuarioRepository.delete(usuario);
+        if (usuario != null) {
+            usuarioRepository.delete(usuario);
+        }
     }
 
-    private Usuario getUsuarioById(long id) {
-        return usuarioRepository.findById(id)
+    private Usuario getUsuarioById(Long id) {
+        Long idUsuario = Objects.requireNonNull(id, "El ID del usuario no puede ser nulo");
+        return usuarioRepository.findById(idUsuario)
                 .orElseThrow(() -> new EntityNotFoundException("Usuarios", "ID", id));  
     }
 
