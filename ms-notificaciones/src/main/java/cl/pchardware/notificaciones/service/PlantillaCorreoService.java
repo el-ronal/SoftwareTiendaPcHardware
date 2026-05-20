@@ -1,7 +1,9 @@
 package cl.pchardware.notificaciones.service;
 
 import java.util.List;
+import java.util.Objects;
 
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,38 +25,68 @@ public class PlantillaCorreoService {
 
     @Transactional(readOnly = true)
     public List<PlantillaCorreoResponse> findAll() {
-        return plantillaMapper.toResponseList(plantillaRepository.findAll());
+        List<PlantillaCorreo> plantillas = plantillaRepository.findAll();
+        return plantillaMapper.toResponseList(plantillas);
     }
 
     @Transactional(readOnly = true)
     public PlantillaCorreoResponse findById(Integer id) {
-        return plantillaMapper.toResponse(getPlantillaById(id));
+        if (id == null) {
+            throw new IllegalArgumentException("ID no puede ser nulo");
+        }
+        PlantillaCorreo plantilla = getPlantillaById(id);
+        return plantillaMapper.toResponse(plantilla);
     }
 
     @Transactional
     public PlantillaCorreoResponse create(PlantillaCorreoRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Request no puede ser nulo");
+        }
         if (plantillaRepository.existsByCodigoEvento(request.getCodigoEvento())) {
             throw new DuplicateResourceException("PlantillaCorreo", "codigoEvento", request.getCodigoEvento(), request.getAsunto());
         }
-        return plantillaMapper.toResponse(plantillaRepository.save(plantillaMapper.toEntity(request)));
+        PlantillaCorreo entity = plantillaMapper.toEntity(request);
+        
+        PlantillaCorreo saved = plantillaRepository.save(Objects.requireNonNull(entity));
+        return plantillaMapper.toResponse(saved);
     }
 
     @Transactional
     public PlantillaCorreoResponse update(Integer id, PlantillaCorreoRequest request) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID no puede ser nulo");
+        }
+        if (request == null) {
+            throw new IllegalArgumentException("Request no puede ser nulo");
+        }
         PlantillaCorreo plantilla = getPlantillaById(id);
+        
         plantillaRepository.findByCodigoEvento(request.getCodigoEvento())
                 .filter(p -> !p.getIdPlantilla().equals(id))
-                .ifPresent(p -> { throw new DuplicateResourceException("PlantillaCorreo", "codigoEvento", request.getCodigoEvento(), request.getAsunto()); });
+                .ifPresent(p -> { 
+                    throw new DuplicateResourceException("PlantillaCorreo", "codigoEvento", request.getCodigoEvento(), request.getAsunto()); 
+                });
+                
         plantillaMapper.updateEntity(request, plantilla);
-        return plantillaMapper.toResponse(plantillaRepository.save(plantilla));
+        
+        PlantillaCorreo saved = plantillaRepository.save(Objects.requireNonNull(plantilla));
+        return plantillaMapper.toResponse(saved);
     }
 
     @Transactional
     public void deleteById(Integer id) {
-        plantillaRepository.delete(getPlantillaById(id));
+        if (id == null) {
+            throw new IllegalArgumentException("ID no puede ser nulo");
+        }
+        PlantillaCorreo plantilla = getPlantillaById(id);
+        
+        plantillaRepository.delete(Objects.requireNonNull(plantilla));
     }
 
+    @NonNull
     private PlantillaCorreo getPlantillaById(Integer id) {
+        Objects.requireNonNull(id, "ID no puede ser nulo");
         return plantillaRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("PlantillaCorreo", "ID", id));
     }
