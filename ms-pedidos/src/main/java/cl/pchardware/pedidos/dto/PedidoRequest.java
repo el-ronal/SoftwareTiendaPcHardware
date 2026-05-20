@@ -1,27 +1,28 @@
 package cl.pchardware.pedidos.dto;
 
-import java.util.List;
-
+import cl.pchardware.pedidos.model.Pedido;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class PedidoRequest {
 
-    @NotNull(message = "El ID del usuario es obligatorio")
+    @NotNull(message = "El ID de usuario es obligatorio")
     private Integer idUsuario;
 
-    @NotBlank(message = "El estado es obligatorio")
-    @Size(max = 20, message = "El estado no puede superar los 20 caracteres")
-    private String estado;
+    @NotNull(message = "El estado es obligatorio")
+    private Pedido.EstadoPedido estado;
 
     @NotNull(message = "El total es obligatorio")
-    @Min(value = 0, message = "El total debe ser igual o mayor a 0")
+    @Min(value = 0, message = "El total no puede ser negativo")
     private Integer totalClp;
-
-    @NotNull(message = "Los detalles del pedido son obligatorios")
-    private List<DetallePedidoRequest> detalles;
 }

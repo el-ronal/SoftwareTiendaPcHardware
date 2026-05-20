@@ -1,5 +1,4 @@
 package cl.pchardware.envios.dto;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -15,7 +14,7 @@ import lombok.Setter;
 @Builder
 public class CourierRequest {
 
-    @NotBlank(message = "El código es obligatorio")
+    @NotBlank(message = "El código del courier es obligatorio")
     @Size(max = 15, message = "El código no puede superar los 15 caracteres")
     private String codigo;
 

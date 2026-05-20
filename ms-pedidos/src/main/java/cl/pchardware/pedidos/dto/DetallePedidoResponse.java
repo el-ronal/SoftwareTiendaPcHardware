@@ -1,10 +1,20 @@
 package cl.pchardware.pedidos.dto;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class DetallePedidoResponse {
-    private Long idDetalle;
+
+    private Integer idDetalle;
+    private Integer idPedido;
     private String skuProducto;
     private Integer cantidad;
     private Integer precioUnitario;

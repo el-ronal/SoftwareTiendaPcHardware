@@ -1,5 +1,4 @@
 package cl.pchardware.pagos.mapper;
-
 import java.util.List;
 
 import org.mapstruct.Mapper;
@@ -13,16 +12,20 @@ import cl.pchardware.pagos.model.Reembolso;
 @Mapper(componentModel = "spring")
 public interface ReembolsoMapper {
 
+    // Transforma el Request a Entidad. Ignoramos campos autogenerados, auditoría (fechaProceso)
+    // y relaciones directas que resolverá el service.
     @Mapping(target = "idReembolso", ignore = true)
-    @Mapping(target = "transaccion", ignore = true) // Se gestiona en el Service buscando la entidad por idTransaccion
-    @Mapping(target = "fechaProceso", ignore = true) // Generado automáticamente por @CreatedDate
+    @Mapping(target = "transaccion", ignore = true)
+    @Mapping(target = "fechaProceso", ignore = true)
     Reembolso toEntity(ReembolsoRequest request);
 
-    @Mapping(source = "transaccion.idTransaccion", target = "idTransaccion")
+    // Transforma la Entidad a Response mapeando de forma explícita el id de la transacción relacionada.
+    @Mapping(target = "idTransaccion", source = "transaccion.idTransaccion")
     ReembolsoResponse toResponse(Reembolso reembolso);
 
     List<ReembolsoResponse> toResponseList(List<Reembolso> reembolsos);
 
+    // Actualización in-place para la entidad Reembolso.
     @Mapping(target = "idReembolso", ignore = true)
     @Mapping(target = "transaccion", ignore = true)
     @Mapping(target = "fechaProceso", ignore = true)

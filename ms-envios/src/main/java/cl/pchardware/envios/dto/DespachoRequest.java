@@ -1,6 +1,6 @@
 package cl.pchardware.envios.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import cl.pchardware.envios.model.Despacho;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -16,16 +16,15 @@ import lombok.Setter;
 @Builder
 public class DespachoRequest {
 
-    @NotNull(message = "El ID de dirección es obligatorio")
+    @NotNull(message = "El ID de la dirección de envío es obligatorio")
     private Integer idDireccion;
 
-    @NotNull(message = "El ID de courier es obligatorio")
+    @NotNull(message = "El ID del courier es obligatorio")
     private Integer idCourier;
 
     @Size(max = 50, message = "El código de seguimiento no puede superar los 50 caracteres")
     private String codigoSeguimiento;
 
-    @NotBlank(message = "El estado logístico es obligatorio")
-    @Size(max = 20, message = "El estado logístico no puede superar los 20 caracteres")
-    private String estadoLogistico;
+    @NotNull(message = "El estado logístico es obligatorio")
+    private Despacho.EstadoLogistico estadoLogistico;
 }

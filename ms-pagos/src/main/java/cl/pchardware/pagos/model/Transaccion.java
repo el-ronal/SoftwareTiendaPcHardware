@@ -1,10 +1,12 @@
 package cl.pchardware.pagos.model;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -29,14 +31,14 @@ public class Transaccion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_transaccion")
+    @Column(name = "id_transaccion", nullable = false)
     private Integer idTransaccion;
 
     @Column(name = "id_pedido", nullable = false)
     private Integer idPedido;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_metodo", nullable = false)
+    @JoinColumn(name = "id_metodo", nullable = false, foreignKey = @ForeignKey(name = "fk_transaccion_metodo"))
     private MetodoPago metodoPago;
 
     @Column(name = "monto_clp", nullable = false)
@@ -46,7 +48,7 @@ public class Transaccion {
     @Column(name = "estado", nullable = false, length = 20)
     private EstadoTransaccion estado;
 
-    @OneToOne(mappedBy = "transaccion", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "transaccion", cascade = CascadeType.ALL, orphanRemoval = true)
     private Reembolso reembolso;
 
     public enum EstadoTransaccion {

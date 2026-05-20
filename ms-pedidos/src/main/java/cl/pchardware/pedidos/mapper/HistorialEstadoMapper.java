@@ -13,17 +13,24 @@ import cl.pchardware.pedidos.model.HistorialEstado;
 @Mapper(componentModel = "spring")
 public interface HistorialEstadoMapper {
 
-    @Mapping(target = "idHistorial", ignore = true)
-    @Mapping(target = "pedido", ignore = true) // Se asigna en el Service
-    @Mapping(target = "fechaCambio", ignore = true) // Generado por JPA Auditing o BD
-    HistorialEstado toEntity(HistorialEstadoRequest request);
-
-    HistorialEstadoResponse toResponse(HistorialEstado historial);
-
-    List<HistorialEstadoResponse> toResponseList(List<HistorialEstado> historiales);
-
+    // Transforma el Request a Entidad. Ignoramos campos autogenerados y relaciones
+    // directas del service.
     @Mapping(target = "idHistorial", ignore = true)
     @Mapping(target = "pedido", ignore = true)
     @Mapping(target = "fechaCambio", ignore = true)
-    void updateEntity(HistorialEstadoRequest request, @MappingTarget HistorialEstado historial);
+    HistorialEstado toEntity(HistorialEstadoRequest request);
+
+    // Transforma la Entidad a Response mapeando de forma explícita el id del pedido
+    // relacionado.
+    @Mapping(target = "idPedido", source = "pedido.idPedido")
+    HistorialEstadoResponse toResponse(HistorialEstado historialEstado);
+
+    List<HistorialEstadoResponse> toResponseList(List<HistorialEstado> historiales);
+
+    // Actualización in-place para la trazabilidad si fuese necesario corregir un
+    // registro.
+    @Mapping(target = "idHistorial", ignore = true)
+    @Mapping(target = "pedido", ignore = true)
+    @Mapping(target = "fechaCambio", ignore = true)
+    void updateEntity(HistorialEstadoRequest request, @MappingTarget HistorialEstado historialEstado);
 }

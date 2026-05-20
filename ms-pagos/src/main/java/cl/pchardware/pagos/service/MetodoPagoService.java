@@ -1,20 +1,25 @@
 package cl.pchardware.pagos.service;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import cl.pchardware.common.exception.DuplicateResourceException;
+import cl.pchardware.common.exception.EntityNotFoundException;
+import cl.pchardware.common.exception.ReferentialIntegrityException;
 import cl.pchardware.pagos.dto.MetodoPagoRequest;
 import cl.pchardware.pagos.dto.MetodoPagoResponse;
 import cl.pchardware.pagos.mapper.MetodoPagoMapper;
 import cl.pchardware.pagos.model.MetodoPago;
 import cl.pchardware.pagos.repository.MetodoPagoRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Servicio encargado de aplicar las reglas de negocio de métodos de pago.
+ * Servicio encargado de aplicar las reglas de negocio para los Métodos de Pago:
+ * - Valida unicidad del código de la pasarela.
+ * - Garantiza reglas de integridad referencial al intentar eliminar.
  */
 @Service
 @RequiredArgsConstructor
@@ -31,22 +36,28 @@ public class MetodoPagoService {
         return metodoPagoMapper.toResponse(getMetodoPagoById(id));
     }
 
+    public MetodoPagoResponse findByCodigo(String codigo) {
+        return metodoPagoMapper.toResponse(getMetodoPagoByCodigo(Objects.requireNonNull(codigo, "codigo")));
+    }
+
     @Transactional
     public MetodoPagoResponse create(MetodoPagoRequest request) {
-        validateCodigoUnico(request.getCodigo());
-        MetodoPago metodoPago = new MetodoPago();
+        String codigo = Objects.requireNonNull(request.getCodigo(), "codigo");
+        validateCodigoUnico(codigo);
+        MetodoPago metodoPago = Objects.requireNonNull(new MetodoPago(), "metodoPago");
         metodoPagoMapper.updateEntity(request, metodoPago);
-        return metodoPagoMapper.toResponse(metodoPagoRepository.save(metodoPago));
+        return metodoPagoMapper.toResponse(metodoPagoRepository.save(Objects.requireNonNull(metodoPago, "metodoPago")));
     }
 
     @Transactional
     public MetodoPagoResponse update(Integer id, MetodoPagoRequest request) {
-        MetodoPago metodoPago = getMetodoPagoById(id);
-        if (!metodoPago.getCodigo().equalsIgnoreCase(request.getCodigo())) {
-            validateCodigoUnico(request.getCodigo());
+        String codigo = Objects.requireNonNull(request.getCodigo(), "codigo");
+        if (!checkMismoCodigo(id, codigo)) {
+            validateCodigoUnico(codigo);
         }
+        MetodoPago metodoPago = getMetodoPagoById(id);
         metodoPagoMapper.updateEntity(request, metodoPago);
-        return metodoPagoMapper.toResponse(metodoPagoRepository.save(metodoPago));
+        return metodoPagoMapper.toResponse(metodoPagoRepository.save(Objects.requireNonNull(metodoPago, "metodoPago")));
     }
 
     @Transactional
@@ -59,21 +70,32 @@ public class MetodoPagoService {
         }
         
         if (!tablasAsociadas.isEmpty()) {
-            throw new RuntimeException("ReferentialIntegrityException: No se puede eliminar el método de pago con ID " + id + " porque tiene registros asociados en: " + String.join(", ", tablasAsociadas));
+            throw new ReferentialIntegrityException("Método de Pago", id, String.join(", ", tablasAsociadas));
         }
-        metodoPagoRepository.delete(metodoPago);
-    }
-
-    private MetodoPago getMetodoPagoById(Integer id) {
-        return metodoPagoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("EntityNotFoundException: Método de Pago no encontrado con ID: " + id));
+        
+        metodoPagoRepository.delete(Objects.requireNonNull(metodoPago, "metodoPago"));
     }
 
     private void validateCodigoUnico(String codigo) {
-        boolean existe = metodoPagoRepository.findAll().stream()
-                .anyMatch(mp -> mp.getCodigo().equalsIgnoreCase(codigo));
-        if (existe) {
-            throw new RuntimeException("DuplicateResourceException: El código de método de pago '" + codigo + "' ya está registrado.");
-        }
+        metodoPagoRepository.findByCodigo(codigo).ifPresent(m -> {
+            throw new DuplicateResourceException("Un Método de Pago", "Código", codigo, m.getNombre());
+        });
+    }
+
+    private MetodoPago getMetodoPagoById(Integer id) {
+        Objects.requireNonNull(id, "id");
+        return metodoPagoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Método de Pago", "ID", id));
+    }
+
+    private MetodoPago getMetodoPagoByCodigo(String codigo) {
+        Objects.requireNonNull(codigo, "codigo");
+        return metodoPagoRepository.findByCodigo(codigo)
+                .orElseThrow(() -> new EntityNotFoundException("Método de Pago", "Código", codigo));
+    }
+
+    private boolean checkMismoCodigo(Integer id, String codigo) {
+        MetodoPago metodoPago = getMetodoPagoById(id);
+        return codigo.equalsIgnoreCase(metodoPago.getCodigo());
     }
 }

@@ -12,6 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class CourierResponse {
+
     private Integer idCourier;
     private String codigo;
     private String nombreEmpresa;

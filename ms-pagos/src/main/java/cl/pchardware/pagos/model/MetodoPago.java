@@ -1,25 +1,11 @@
 package cl.pchardware.pagos.model;
 
+import lombok.*;
+import jakarta.persistence.*;
 import java.util.List;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 @Entity
-@Table(name = "metodo_pago", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "codigo")
-})
+@Table(name = "metodo_pago")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -29,7 +15,7 @@ public class MetodoPago {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_metodo")
+    @Column(name = "id_metodo", nullable = false)
     private Integer idMetodo;
 
     @Column(name = "codigo", nullable = false, unique = true, length = 20)
@@ -42,15 +28,13 @@ public class MetodoPago {
     @Builder.Default
     private Boolean activo = true;
 
-    @OneToMany(mappedBy = "metodoPago")
+    @OneToMany(mappedBy = "metodoPago", cascade = CascadeType.ALL)
     private List<Transaccion> transacciones;
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         MetodoPago that = (MetodoPago) o;
         return idMetodo != null && idMetodo.equals(that.idMetodo);
     }
