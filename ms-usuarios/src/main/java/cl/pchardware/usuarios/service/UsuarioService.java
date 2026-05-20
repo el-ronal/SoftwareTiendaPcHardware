@@ -1,19 +1,20 @@
 package cl.pchardware.usuarios.service;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import cl.pchardware.common.exception.DuplicateResourceException;
-import cl.pchardware.common.exception.EntityNotFoundException;
 import cl.pchardware.usuarios.dto.UsuarioRequest;
 import cl.pchardware.usuarios.dto.UsuarioResponse;
 import cl.pchardware.usuarios.mapper.UsuarioMapper;
-import cl.pchardware.usuarios.model.Rol;
+import cl.pchardware.usuarios.model.Perfil;
 import cl.pchardware.usuarios.model.Usuario;
-import cl.pchardware.usuarios.repository.RolRepository;
 import cl.pchardware.usuarios.repository.UsuarioRepository;
+import cl.pchardware.common.exception.DuplicateResourceException;
+import cl.pchardware.common.exception.EntityNotFoundException;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -21,55 +22,80 @@ import lombok.RequiredArgsConstructor;
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
-    private final RolRepository rolRepository;
     private final UsuarioMapper usuarioMapper;
+    
+    // Inyectamos los servicios hermanos
+    private final RolService rolService;
+    private final PerfilService perfilService;
 
-    @Transactional(readOnly = true)
     public List<UsuarioResponse> findAll() {
         return usuarioMapper.toResponseList(usuarioRepository.findAll());
     }
 
-    @Transactional(readOnly = true)
-    public UsuarioResponse findById(Integer id) {
+    public UsuarioResponse findById(Long id) {
         return usuarioMapper.toResponse(getUsuarioById(id));
     }
 
     @Transactional
     public UsuarioResponse create(UsuarioRequest request) {
-        if (usuarioRepository.existsByEmail(request.getEmail())) {
-            throw new DuplicateResourceException("Usuario", "email", request.getEmail(), request.getEmail());
-        }
-        Rol rol = getRolById(request.getIdRol());
+        validateEmailUnico(request.getEmail());
+
         Usuario usuario = usuarioMapper.toEntity(request);
-        usuario.setRol(rol);
+        
+        // 1. Delegamos la obtención del Rol
+        usuario.setRol(rolService.getRolByNombre(request.getRol()));
+        
+        // 2. Asignamos la contraseña directamente (como en el ejemplo del profesor)
+        usuario.setPasswordHash(request.getPassword());
+
+        // 3. Delegamos la construcción del Perfil
+        Perfil perfil = perfilService.buildPerfilParaUsuario(request.getPerfil(), usuario);
+        usuario.setPerfil(perfil);
+
         return usuarioMapper.toResponse(usuarioRepository.save(usuario));
     }
 
     @Transactional
-    public UsuarioResponse update(Integer id, UsuarioRequest request) {
+    public UsuarioResponse update(Long id, UsuarioRequest request) {
         Usuario usuario = getUsuarioById(id);
-        usuarioRepository.findByEmail(request.getEmail())
-                .filter(u -> !u.getIdUsuario().equals(id))
-                .ifPresent(u -> { throw new DuplicateResourceException("Usuario", "email", request.getEmail(), request.getEmail()); });
-        Rol rol = getRolById(request.getIdRol());
+
+        if (!usuario.getEmail().equalsIgnoreCase(request.getEmail())) {
+            validateEmailUnico(request.getEmail());
+        }
+
         usuarioMapper.updateEntity(request, usuario);
-        usuario.setRol(rol);
+        
+        if (!usuario.getRol().getNombre().equalsIgnoreCase(request.getRol())) {
+            usuario.setRol(rolService.getRolByNombre(request.getRol()));
+        }
+
+        if (request.getPassword() != null && !request.getPassword().isBlank()) {
+            usuario.setPasswordHash(request.getPassword());
+        }
+
+        // Delegamos la actualización del perfil
+        perfilService.actualizarPerfil(request.getPerfil(), usuario.getPerfil());
+
         return usuarioMapper.toResponse(usuarioRepository.save(usuario));
     }
 
     @Transactional
-    public void deleteById(Integer id) {
+    public void deleteById(Long id) {
         Usuario usuario = getUsuarioById(id);
-        usuarioRepository.delete(usuario);
+        if (usuario != null) {
+            usuarioRepository.delete(usuario);
+        }
     }
 
-    private Usuario getUsuarioById(Integer id) {
-        return usuarioRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Usuario", "ID", id));
+    private Usuario getUsuarioById(Long id) {
+        Long idUsuario = Objects.requireNonNull(id, "El ID del usuario no puede ser nulo");
+        return usuarioRepository.findById(idUsuario)
+                .orElseThrow(() -> new EntityNotFoundException("Usuarios", "ID", id));  
     }
 
-    private Rol getRolById(Integer idRol) {
-        return rolRepository.findById(idRol)
-                .orElseThrow(() -> new EntityNotFoundException("Rol", "ID", idRol));
+    private void validateEmailUnico(String email) {
+        usuarioRepository.findByEmail(email).ifPresent(u -> {
+            throw new DuplicateResourceException("Un Usuario", "email", email, "Vinculado al RUT " + u.getPerfil().getRut());
+        });
     }
 }

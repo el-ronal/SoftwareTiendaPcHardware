@@ -1,16 +1,11 @@
 package cl.pchardware.catalogo.repository;
 
-import java.util.Optional;
-
+import cl.pchardware.catalogo.model.Categoria;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import cl.pchardware.catalogo.model.Categoria;
+import java.util.Optional;
 
 @Repository
-public interface CategoriaRepository extends JpaRepository<Categoria, Integer> {
-
+public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
     Optional<Categoria> findBySlug(String slug);
-
-    boolean existsBySlug(String slug);
 }

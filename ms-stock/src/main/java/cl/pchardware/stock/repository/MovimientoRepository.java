@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface MovimientoRepository extends JpaRepository<Movimiento, Long> {
     List<Movimiento> findByInventarioIdInventarioOrderByFechaRegistroDesc(Long idInventario);
+    List<Movimiento> findByInventarioIdInventario(Long idInventario);
+    
 }

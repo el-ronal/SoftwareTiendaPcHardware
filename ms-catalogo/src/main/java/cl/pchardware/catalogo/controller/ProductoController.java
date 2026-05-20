@@ -1,16 +1,14 @@
 package cl.pchardware.catalogo.controller;
 
-import java.util.List;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import cl.pchardware.catalogo.dto.ProductoRequest;
 import cl.pchardware.catalogo.dto.ProductoResponse;
 import cl.pchardware.catalogo.service.ProductoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,12 +22,7 @@ public class ProductoController {
         return ResponseEntity.ok(productoService.findAll());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ProductoResponse> findById(@PathVariable Integer id) {
-        return ResponseEntity.ok(productoService.findById(id));
-    }
-
-    @GetMapping("/sku/{sku}")
+    @GetMapping("/{sku}")
     public ResponseEntity<ProductoResponse> findBySku(@PathVariable String sku) {
         return ResponseEntity.ok(productoService.findBySku(sku));
     }
@@ -39,14 +32,16 @@ public class ProductoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(productoService.create(request));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ProductoResponse> update(@PathVariable Integer id, @Valid @RequestBody ProductoRequest request) {
-        return ResponseEntity.ok(productoService.update(id, request));
+    @PutMapping("/{sku}")
+    public ResponseEntity<ProductoResponse> update(
+            @PathVariable String sku, 
+            @Valid @RequestBody ProductoRequest request) {
+        return ResponseEntity.ok(productoService.update(sku, request));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteById(@PathVariable Integer id) {
-        productoService.deleteById(id);
+    @DeleteMapping("/{sku}")
+    public ResponseEntity<Void> deleteBySku(@PathVariable String sku) {
+        productoService.deleteBySku(sku);
         return ResponseEntity.noContent().build();
     }
 }

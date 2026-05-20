@@ -5,11 +5,8 @@ import lombok.Data;
 @Data
 public class ProductoResponse {
 
-    private Integer idProducto;
-    private Integer idMarca;
-    private String nombreMarca;
-    private Integer idCategoria;
-    private String nombreCategoria;
     private String sku;
     private Integer precioClp;
+    private MarcaResponse marca;
+    private CategoriaResponse categoria;
 }

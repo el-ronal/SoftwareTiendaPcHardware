@@ -3,12 +3,17 @@ package cl.pchardware.catalogo.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Objects;
-
 @Entity
-@Table(name = "producto", uniqueConstraints = {
-    @UniqueConstraint(columnNames = "sku")
-})
+@Table(
+    name = "producto",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_producto_sku", columnNames = "sku")
+    },
+    indexes = {
+        @Index(name = "idx_producto_marca", columnList = "id_marca"),
+        @Index(name = "idx_producto_categoria", columnList = "id_categoria")
+    }
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,18 +23,18 @@ public class Producto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_producto")
-    private Integer idProducto;
+    @Column(name = "id_producto", nullable = false)
+    private Long idProducto;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_marca", nullable = false)
     private Marca marca;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_categoria", nullable = false)
     private Categoria categoria;
 
-    @Column(name = "sku", nullable = false, length = 30)
+    @Column(name = "sku", nullable = false, length = 30, unique = true)
     private String sku;
 
     @Column(name = "precio_clp", nullable = false)
@@ -40,11 +45,11 @@ public class Producto {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Producto producto = (Producto) o;
-        return Objects.equals(idProducto, producto.idProducto);
+        return idProducto != null && idProducto.equals(producto.getIdProducto());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idProducto);
+        return getClass().hashCode();
     }
 }
