@@ -1,6 +1,7 @@
 package cl.pchardware.notificaciones.service;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,30 +31,58 @@ public class MensajeService {
 
     @Transactional(readOnly = true)
     public MensajeResponse findById(Integer id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID no puede ser nulo");
+        }
         return mensajeMapper.toResponse(getMensajeById(id));
     }
 
     @Transactional(readOnly = true)
     public List<MensajeResponse> findByUsuario(Integer idUsuario) {
+        if (idUsuario == null) {
+            throw new IllegalArgumentException("ID de usuario no puede ser nulo");
+        }
         return mensajeMapper.toResponseList(mensajeRepository.findByIdUsuario(idUsuario));
     }
 
     @Transactional
     public MensajeResponse create(MensajeRequest request) {
-        PlantillaCorreo plantilla = plantillaRepository.findById(request.getIdPlantilla())
-                .orElseThrow(() -> new EntityNotFoundException("PlantillaCorreo", "ID", request.getIdPlantilla()));
+        if (request == null) {
+            throw new IllegalArgumentException("La solicitud de mensaje no puede ser nula");
+        }
+        
+        Integer idPlantilla = request.getIdPlantilla();
+        if (idPlantilla == null) {
+            throw new IllegalArgumentException("ID de plantilla no puede ser nulo");
+        }
+        
+        PlantillaCorreo plantilla = plantillaRepository.findById(idPlantilla)
+                .orElseThrow(() -> new EntityNotFoundException("PlantillaCorreo", "ID", idPlantilla));
+        
         Mensaje mensaje = mensajeMapper.toEntity(request);
+        if (mensaje == null) {
+            throw new IllegalStateException("No se pudo crear el mensaje desde el request");
+        }
+        
         mensaje.setPlantilla(plantilla);
         return mensajeMapper.toResponse(mensajeRepository.save(mensaje));
     }
 
     @Transactional
-    public void deleteById(Integer id) {
-        mensajeRepository.delete(getMensajeById(id));
+public void deleteById(Integer id) {
+    if (id == null) {
+        throw new IllegalArgumentException("ID no puede ser nulo");
     }
+    
+    Mensaje mensaje = getMensajeById(id);
+    if (mensaje != null) {
+        mensajeRepository.delete(mensaje);
+    }
+}
 
-    private Mensaje getMensajeById(Integer id) {
-        return mensajeRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Mensaje", "ID", id));
-    }
+private Mensaje getMensajeById(Integer id) {
+    Objects.requireNonNull(id, "ID no puede ser nulo");
+    return mensajeRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Mensaje", "ID", id));
+}
 }
