@@ -86,8 +86,11 @@ public class PlantillaCorreoService {
 
     @NonNull
     private PlantillaCorreo getPlantillaById(Integer id) {
-        Objects.requireNonNull(id, "ID no puede ser nulo");
-        return plantillaRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("PlantillaCorreo", "ID", id));
+        Integer idPlantilla = Objects.requireNonNull(id, "ID no puede ser nulo");
+        
+        return Objects.requireNonNull(
+                plantillaRepository.findById(idPlantilla)
+                        .orElseThrow(() -> new EntityNotFoundException("PlantillaCorreo", "ID", id))
+        );
     }
 }
