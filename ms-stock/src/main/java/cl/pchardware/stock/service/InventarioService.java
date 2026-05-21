@@ -34,7 +34,7 @@ public class InventarioService {
     public InventarioResponse create(InventarioRequest request) {
         Bodega bodega = bodegaService.getBodegaByCodigo(request.getCodigoBodega());
 
-        inventarioRepository.findByBodegaIdAndSkuProducto(bodega.getIdBodega(), request.getSkuProducto())
+        inventarioRepository.findByBodegaIdBodegaAndSkuProducto(bodega.getIdBodega(), request.getSkuProducto())
             .ifPresent(i -> {
                 throw new DuplicateResourceException("Inventario", "SKU", request.getSkuProducto(), "Bodega " + bodega.getCodigo());
             });
