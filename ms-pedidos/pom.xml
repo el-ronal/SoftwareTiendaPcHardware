@@ -40,12 +40,23 @@
 
     <!-- Dependencias necesarias para este microservicio -->
     <dependencies>
-
+        <dependency>
+            <groupId>cl.pchardware</groupId>
+            <artifactId>cl-pchardware-pagos</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
 
         <!-- Modulo Common: excepciones globales y handler compartido -->
         <dependency>
             <groupId>cl.pchardware</groupId>
             <artifactId>cl-pchardware-common</artifactId>
+        </dependency>
+
+        <!-- Modulo Envios: DTOs compartidos para clientes Feign -->
+        <dependency>
+            <groupId>cl.pchardware</groupId>
+            <artifactId>cl-pchardware-envios</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
         <!-- Spring Web: Controladores REST -->

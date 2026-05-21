@@ -40,7 +40,12 @@
 
     <!-- Dependencias necesarias para este microservicio -->
     <dependencies>
-
+        <dependency>
+            <groupId>cl.pchardware</groupId>
+            <artifactId>cl-pchardware-pedidos</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        
         <!-- Modulo Common: excepciones globales y handler compartido -->
         <dependency>
             <groupId>cl.pchardware</groupId>
