@@ -1,11 +1,77 @@
+# ── Configuración Base (aplica a TODOS los entornos) ────────
 server:
-  port: 8761
+  port: 8761                  # Puerto estándar de Eureka
 
 spring:
   application:
-    name: eureka-server
+    name: eureka-server       # Nombre con el que este servidor se identifica
+  profiles:
+    active: dev               # Entorno por defecto al arrancar en local
 
 eureka:
   client:
-    register-with-eureka: false
-    fetch-registry: false
+    register-with-eureka: false # Este ES el servidor, no necesita registrarse
+    fetch-registry: false       # Modo standalone
+
+# Actuator: monitoreo y salud del servidor
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+      probes:
+        enabled: true
+
+# Info del proyecto
+info:
+  app:
+    name: ${spring.application.name}
+    version: "@project.version@"
+    description: "Servidor de descubrimiento de microservicios"
+
+# ── Perfil: Desarrollo (tu PC local) ────────────────────────
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+eureka:
+  server:
+    enable-self-preservation: false
+    eviction-interval-timer-in-ms: 2000
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,env,loggers
+
+# ── Perfil: Producción (servidor real) ──────────────────────
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+eureka:
+  server:
+    enable-self-preservation: true
+    renewal-percent-threshold: 0.85
+
+management:
+  endpoint:
+    health:
+      show-details: when-authorized
+  endpoints:
+    web:
+      exposure:
+        include: health,info

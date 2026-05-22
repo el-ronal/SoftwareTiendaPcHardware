@@ -4,6 +4,7 @@ import cl.pchardware.usuarios.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -16,5 +17,5 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     // boolean existsByEmail(String email);
     
     // Aprovecha el índice 'idx_usuario_estado' que creaste en el script SQL
-    // List<Usuario> findByEstado(String estado);
+    List<Usuario> findByEstado(String estado);
 }

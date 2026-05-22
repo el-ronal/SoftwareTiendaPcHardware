@@ -14,7 +14,8 @@ import cl.pchardware.usuarios.repository.UsuarioRepository;
 import cl.pchardware.common.exception.DuplicateResourceException;
 import cl.pchardware.common.exception.EntityNotFoundException;
 
-import jakarta.transaction.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -23,7 +24,7 @@ public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final UsuarioMapper usuarioMapper;
-    
+    private final PasswordEncoder passwordEncoder;
     // Inyectamos los servicios hermanos
     private final RolService rolService;
     private final PerfilService perfilService;
@@ -34,6 +35,13 @@ public class UsuarioService {
 
     public UsuarioResponse findById(Long id) {
         return usuarioMapper.toResponse(getUsuarioById(id));
+    }
+    
+    @Transactional(readOnly = true)
+    public List<UsuarioResponse> findByEstado(String estado) {
+        // Opcional: Podrías validar que el estado sea ACTIVO, INACTIVO o BANEADO aquí
+        List<Usuario> usuarios = usuarioRepository.findByEstado(estado.toUpperCase());
+        return usuarioMapper.toResponseList(usuarios);
     }
 
     @Transactional
@@ -46,7 +54,8 @@ public class UsuarioService {
         usuario.setRol(rolService.getRolByNombre(request.getRol()));
         
         // 2. Asignamos la contraseña directamente (como en el ejemplo del profesor)
-        usuario.setPasswordHash(request.getPassword());
+        String hashedPassword = passwordEncoder.encode(request.getPassword());
+        usuario.setPasswordHash(hashedPassword);
 
         // 3. Delegamos la construcción del Perfil
         Perfil perfil = perfilService.buildPerfilParaUsuario(request.getPerfil(), usuario);
@@ -69,8 +78,9 @@ public class UsuarioService {
             usuario.setRol(rolService.getRolByNombre(request.getRol()));
         }
 
-        if (request.getPassword() != null && !request.getPassword().isBlank()) {
-            usuario.setPasswordHash(request.getPassword());
+       if (request.getPassword() != null && !request.getPassword().isBlank()) {
+            String nuevoHash = passwordEncoder.encode(request.getPassword());
+            usuario.setPasswordHash(nuevoHash);
         }
 
         // Delegamos la actualización del perfil

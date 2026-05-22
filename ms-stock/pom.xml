@@ -42,6 +42,18 @@
     <!-- Dependencias necesarias para este microservicio -->
     <dependencies>
 
+        <!-- Spring Kafka -->
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+
+        <!-- Spring Boot Actuator: endpoints de monitoreo y salud -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
         <!-- Modulo Common: excepciones globales y handler compartido -->
         <dependency>
             <groupId>cl.pchardware</groupId>
