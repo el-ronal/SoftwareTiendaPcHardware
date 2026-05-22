@@ -1,0 +1,13 @@
+C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\exception\ReferentialIntegrityException.java
+C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\event\GarantiaCreadaEvent.java
+C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\CommonAutoConfiguration.java
+C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\exception\ApiError.java
+C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\event\NotificacionEvent.java
+C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\event\PedidoCreadoEvent.java
+C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\event\PedidoEvent.java
+C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\exception\GlobalExceptionHandler.java
+C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\event\PagoAprobadoEvent.java
+C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\event\DevolucionCreadaEvent.java
+C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\event\PedidoActualizadoEvent.java
+C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\exception\EntityNotFoundException.java
+C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\exception\DuplicateResourceException.java

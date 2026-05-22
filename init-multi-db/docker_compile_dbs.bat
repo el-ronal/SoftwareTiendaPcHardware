@@ -1,0 +1,13 @@
+docker exec -i postgres-db psql -U postgres -d tienda < 01-init.sql
+docker exec -i postgres-db psql -U postgres -d tienda < 02-create_usuarios.sql
+docker exec -i postgres-db psql -U postgres -d tienda < 03-create_catalogo.sql
+docker exec -i postgres-db psql -U postgres -d tienda < 04-create_stock.sql
+docker exec -i postgres-db psql -U postgres -d tienda < 05-create_pedidos.sql
+docker exec -i postgres-db psql -U postgres -d tienda < 06-create_pagos.sql
+docker exec -i postgres-db psql -U postgres -d tienda < 07-create_envios.sql
+docker exec -i postgres-db psql -U postgres -d tienda < 08-create_tasacion.sql
+docker exec -i postgres-db psql -U postgres -d tienda < 09-create_garantias.sql
+docker exec -i postgres-db psql -U postgres -d tienda < 10-create_devoluciones.sql
+docker exec -i postgres-db psql -U postgres -d tienda < 11-create_soporte.sql
+docker exec -i postgres-db psql -U postgres -d tienda < 12-create_armado.sql
+docker exec -i postgres-db psql -U postgres -d tienda < 13-create_notificaciones.sql
