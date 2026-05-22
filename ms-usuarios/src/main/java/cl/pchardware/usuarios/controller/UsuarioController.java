@@ -36,6 +36,11 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.findById(id));
     }
 
+    @GetMapping("/estado/{estado}")
+    public ResponseEntity<List<UsuarioResponse>> findByEstado(@PathVariable String estado) {
+        return ResponseEntity.ok(usuarioService.findByEstado(estado));
+    }
+
     @PostMapping
     public ResponseEntity<UsuarioResponse> create(@Valid @RequestBody UsuarioRequest request) {
         UsuarioResponse creado = usuarioService.create(request);

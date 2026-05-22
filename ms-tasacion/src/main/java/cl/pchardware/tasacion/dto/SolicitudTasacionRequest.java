@@ -9,7 +9,7 @@ import lombok.Data;
 public class SolicitudTasacionRequest {
 
     @NotNull(message = "El ID de usuario es obligatorio")
-    private Integer idUsuario;
+    private Long idUsuario;
 
     @NotBlank(message = "La descripción del hardware es obligatoria")
     @Size(max = 255)
