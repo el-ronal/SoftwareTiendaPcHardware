@@ -49,12 +49,15 @@ INSERT INTO rol (nombre, descripcion) VALUES
 ('TASADOR', 'Especialista interno que aprueba el hardware usado');
 
 -- USUARIOS: Cubre casos de uso normales, inactivos, baneados y correos con caracteres especiales
+-- [JJWT-INI] 
+-- La contraseña por defecto fue configurada como 'SoftwareTienda@2026' para todos los usuarios, y está almacenada como 
+-- hash (huella digital) utilizando el algoritmo BCrypt (generado con BCryptPasswordEncoder de Spring Security).
 INSERT INTO usuario (id_rol, email, password_hash, estado) VALUES
-(1, 'admin.root@pchardware.cl', '$2a$12$R9h/cIPz0gi.URNNX3cam2', 'ACTIVO'),          -- Caso: Admin normal
-(2, 'gamer.pro99@gmail.com', '$2a$12$R9h/cIPz0gi.URNNX3cam3', 'ACTIVO'),             -- Caso: Cliente normal
-(2, 'scammer_baneado@hotmail.com', '$2a$12$R9h/cIPz0gi.URNNX3cam4', 'BANEADO'),      -- Caso borde: Cuenta bloqueada por fraude
-(3, 'tasaciones@pchardware.cl', '$2a$12$R9h/cIPz0gi.URNNX3cam5', 'ACTIVO'),          -- Caso: Empleado tasador
-(2, 'correo.raro+alias@empresa.com.ar', '$2a$12$R9h/cIPz0gi.URNNX3cam6', 'INACTIVO');-- Caso borde: Correo con '+' y subdominio, cuenta inactiva
+(1, 'admin.root@pchardware.cl', '$2a$12$EfQfl6uP9KEODE2XUhn1Ru38rD8.pfV9liP1m2tnOQlxyL6CFGWDO', 'ACTIVO'),          -- Caso: Admin normal
+(2, 'gamer.pro99@gmail.com', '$2a$12$EfQfl6uP9KEODE2XUhn1Ru38rD8.pfV9liP1m2tnOQlxyL6CFGWDO', 'ACTIVO'),             -- Caso: Cliente normal
+(2, 'scammer_baneado@hotmail.com', '$2a$12$EfQfl6uP9KEODE2XUhn1Ru38rD8.pfV9liP1m2tnOQlxyL6CFGWDO', 'BANEADO'),      -- Caso borde: Cuenta bloqueada por fraude
+(3, 'tasaciones@pchardware.cl', '$2a$12$EfQfl6uP9KEODE2XUhn1Ru38rD8.pfV9liP1m2tnOQlxyL6CFGWDO', 'ACTIVO'),          -- Caso: Empleado tasador
+(2, 'correo.raro+alias@empresa.com.ar', '$2a$12$EfQfl6uP9KEODE2XUhn1Ru38rD8.pfV9liP1m2tnOQlxyL6CFGWDO', 'INACTIVO');-- Caso borde: Correo con '+' y subdominio, cuenta inactiva
 
 -- PERFILES: Asociados 1:1, rut chilenos (contexto .cl), y valores nulos permitidos
 INSERT INTO perfil (id_usuario, rut, nombre_completo, telefono) VALUES
