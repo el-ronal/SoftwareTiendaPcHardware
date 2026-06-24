@@ -16,6 +16,17 @@ spring:
       ddl-auto: update
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+# [JJWT-INI]
+# ── Configuración JWT ──────────────────────────────────────────
+# Esta clave secreta DEBE ser idéntica en todos los microservicios
+# para que los tokens generados por ms-usuarios sean válidos en
+# ms-catalogo y ms-recursos.
+# Para dar el valor al "secret" trasformaremos la frase clave (inventada) 
+# "tokenSecretKeySoftwareTienda2026PcHardwareSecurity" a formato Base64
+jwt:
+  secret: "dG9rZW5TZWNyZXRLZXlTb2Z0d2FyZVRpZW5kYTIwMjZQY0hhcmR3YXJlU2VjdXJpdHk="
+  expiration-ms: 3600000   # 1 hora en milisegundos
+# [JJWT-FIN]
 
 eureka:
   client:
