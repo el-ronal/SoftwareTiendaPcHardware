@@ -47,12 +47,12 @@ public class JwtTokenProvider {
         Date expiracion = new Date(ahora.getTime() + jwtProperties.getExpirationMs());
 
         return Jwts.builder()
-                .subject(email)                        // Subject = email del usuario
-                .claim("rol", rol)                     // Claim personalizado: rol
-                .claim("nombre", nombreCompleto)       // Claim personalizado: nombre
-                .issuedAt(ahora)                       // Fecha de emisión
-                .expiration(expiracion)                // Fecha de expiración
-                .signWith(getSigningKey())              // Firma con HMAC-SHA256
+                .subject(email) // Subject = email del usuario
+                .claim("rol", rol) // Claim personalizado: rol
+                .claim("nombre", nombreCompleto) // Claim personalizado: nombre
+                .issuedAt(ahora) // Fecha de emisión
+                .expiration(expiracion) // Fecha de expiración
+                .signWith(getSigningKey()) // Firma con HMAC-SHA256
                 .compact();
     }
 
@@ -67,9 +67,9 @@ public class JwtTokenProvider {
     public boolean validarToken(String token) {
         try {
             Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token);
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             log.warn("Token JWT inválido: {}", e.getMessage());
@@ -99,6 +99,17 @@ public class JwtTokenProvider {
     public String getNombreFromToken(String token) {
         return getClaims(token).get("nombre", String.class);
     }
+
+    // [SWAGGER-INI]
+    /**
+     * Extrae la fecha de expiración del token.
+     * Utilizado por el servicio de logout para saber cuándo
+     * un token en la blacklist puede ser limpiado.
+     */
+    public Date getExpirationFromToken(String token) {
+        return getClaims(token).getExpiration();
+    }
+    // [SWAGGER-FIN]
 
     // ─── Métodos privados ────────────────────────────────────────────────────
 

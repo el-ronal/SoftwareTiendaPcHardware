@@ -24,15 +24,15 @@ import lombok.RequiredArgsConstructor;
  *
  * Matriz de autorización:
  * ┌────────────────────────────┬────────┬────────────────────────────────────┐
- * │ Endpoint                   │ Método │ Acceso                             │
+ * │ Endpoint │ Método │ Acceso │
  * ├────────────────────────────┼────────┼────────────────────────────────────┤
- * │ /api/v1/auth/**            │ ALL    │ Público (sin token)                │
- * │ /actuator/**               │ ALL    │ Público (monitoreo)                │
- * │ /api/v1/tickets-soporte/** │ GET    │ ADMIN, TASADOR                     │
- * │ /api/v1/tickets-soporte/** │ POST   │ ADMIN                              │
- * │ /api/v1/tickets-soporte/** │ PUT    │ ADMIN                              │
- * │ /api/v1/tickets-soporte/** │ DELETE │ ADMIN                              │
- * │ Cualquier otro             │ ALL    │ Autenticado (con token válido)     │
+ * │ /api/v1/auth/** │ ALL │ Público (sin token) │
+ * │ /actuator/** │ ALL │ Público (monitoreo) │
+ * │ /api/v1/tickets-soporte/** │ GET │ ADMIN, TASADOR │
+ * │ /api/v1/tickets-soporte/** │ POST │ ADMIN │
+ * │ /api/v1/tickets-soporte/** │ PUT │ ADMIN │
+ * │ /api/v1/tickets-soporte/** │ DELETE │ ADMIN │
+ * │ Cualquier otro │ ALL │ Autenticado (con token válido) │
  * └────────────────────────────┴────────┴────────────────────────────────────┘
  */
 @Configuration
@@ -45,29 +45,40 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
-            .authorizeHttpRequests(auth -> auth
-                // Actuator siempre público
-                .requestMatchers("/actuator/**").permitAll()
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
 
-                // Lectura de tickets: cualquier rol autenticado
-                .requestMatchers(HttpMethod.GET, "/api/v1/tickets-soporte/**")
-                    .hasAnyRole("Admin", "Tasador", "Cliente")
+                        // [SWAGGER-INI]
+                        // PERMITIR RUTAS PÚBLICAS DE SWAGGER / SPRINGDOC
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/v3/api-docs.yaml",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/swagger-resources/**",
+                                "/webjars/**",
+                                "/favicon.ico")
+                        .permitAll()
+                        // [SWAGGER-FIN]+
 
-                // Escritura de tickets: solo Administrador y Tasador
-                .requestMatchers(HttpMethod.POST, "/api/v1/tickets-soporte/**")
-                    .hasAnyRole("Admin", "Tasador")
-                .requestMatchers(HttpMethod.PUT, "/api/v1/tickets-soporte/**")
-                    .hasAnyRole("Admin", "Tasador")
-                .requestMatchers(HttpMethod.DELETE, "/api/v1/tickets-soporte/**")
-                    .hasAnyRole("Admin", "Tasador")
+                        // Actuator siempre público
+                        .requestMatchers("/actuator/**").permitAll()
 
-                .anyRequest().authenticated()
-            )
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                        // Lectura de tickets: cualquier rol autenticado
+                        .requestMatchers(HttpMethod.GET, "/api/v1/tickets-soporte/**")
+                        .hasAnyRole("Admin", "Tasador", "Cliente")
+
+                        // Escritura de tickets: solo Administrador y Tasador
+                        .requestMatchers(HttpMethod.POST, "/api/v1/tickets-soporte/**")
+                        .hasAnyRole("Admin", "Tasador")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/tickets-soporte/**")
+                        .hasAnyRole("Admin", "Tasador")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/tickets-soporte/**")
+                        .hasAnyRole("Admin", "Tasador")
+
+                        .anyRequest().authenticated())
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

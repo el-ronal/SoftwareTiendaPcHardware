@@ -3,6 +3,16 @@ server:
   error:
     include-stacktrace: never
 
+# [SWAGGER-INI] 
+# Configuración de SpringDoc/Swagger UI
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+# [SWAGGER-FIN] 
+
+
 spring:
   application:
     name: ms-armado
