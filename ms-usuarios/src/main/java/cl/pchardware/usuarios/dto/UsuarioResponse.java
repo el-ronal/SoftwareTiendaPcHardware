@@ -1,9 +1,12 @@
 package cl.pchardware.usuarios.dto;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.springframework.hateoas.RepresentationModel;
 
 @Data
-public class UsuarioResponse {
+@EqualsAndHashCode(callSuper = false)
+public class UsuarioResponse extends RepresentationModel<UsuarioResponse> {
     private Long idUsuario;
     private String email;
     private String estado;

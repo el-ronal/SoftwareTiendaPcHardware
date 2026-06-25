@@ -73,6 +73,7 @@
         <spring-kafka.version>3.3.5</spring-kafka.version>
         <spring-boot-actuator.version>3.5.14</spring-boot-actuator.version>
         <jjwt.version>0.12.6</jjwt.version> <!-- [JJWT] -->
+        <spring-hateoas.version>3.5.14</spring-hateoas.version> <!-- [HATEOAS] -->
     </properties>
 
     <dependencyManagement>
@@ -190,6 +191,13 @@
                 <version>${jjwt.version}</version>
             </dependency>
             <!-- [JJWT-FIN] -->
+
+            <!-- Spring HATEOAS -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-hateoas</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>

@@ -3,9 +3,12 @@ package cl.pchardware.soporte.dto;
 import java.time.LocalDateTime;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.springframework.hateoas.RepresentationModel;
 
 @Data
-public class TicketSoporteResponse {
+@EqualsAndHashCode(callSuper = false)
+public class TicketSoporteResponse extends RepresentationModel<TicketSoporteResponse> {
     private Integer idTicket;
     private Integer idUsuario;
     private String categoria;

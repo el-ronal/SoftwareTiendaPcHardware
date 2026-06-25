@@ -1,9 +1,12 @@
 package cl.pchardware.tasacion.dto;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.springframework.hateoas.RepresentationModel;
 
 @Data
-public class EvaluacionTecnicaResponse {
+@EqualsAndHashCode(callSuper = false)
+public class EvaluacionTecnicaResponse extends RepresentationModel<EvaluacionTecnicaResponse> {
 
     private Integer idEvaluacion;
     private Integer idSolicitud; // Viene de solicitudTasacion.idSolicitud

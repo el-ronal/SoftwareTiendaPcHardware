@@ -5,13 +5,16 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.EqualsAndHashCode;
+import org.springframework.hateoas.RepresentationModel;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class DetallePedidoResponse {
+@EqualsAndHashCode(callSuper = false)
+public class DetallePedidoResponse extends RepresentationModel<DetallePedidoResponse> {
 
     private Integer idDetalle;
     private Integer idPedido;
