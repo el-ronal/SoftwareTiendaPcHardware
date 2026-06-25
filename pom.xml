@@ -29,6 +29,7 @@
         <module>ms-soporte</module>      <!-- Microservicio soporte -->
         <module>ms-armado</module>      <!-- Microservicio armado -->
         <module>ms-notificaciones</module>      <!-- Microservicio notificaciones -->
+        <module>api-gateway</module>
         <module>common</module>
         <!-- CGV: Agrega aqui mas modulos segun sea necesario -->
     </modules>
@@ -55,8 +56,7 @@
         <java.version>21</java.version>                                            <!-- Version de Java a utilizar -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <spring-boot.version>3.5.14</spring-boot.version>                        <!-- Version de Spring Boot base para
-        microservicios -->
+        <spring-boot.version>3.5.14</spring-boot.version>                        <!-- Version de Spring Boot base para microservicios -->
         <spring-cloud.version>2025.0.0</spring-cloud.version>                                 <!-- Version de Spring Cloud -->
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <lombok.version>1.18.44</lombok.version>
@@ -201,7 +201,6 @@
                 <version>${jjwt.version}</version>
             </dependency>
             <!-- [JJWT-FIN] -->
-
             
             <!-- Spring HATEOAS -->
             <dependency>

@@ -8,7 +8,17 @@
       "cwd": "${workspaceFolder}/eureka",
       "mainClass": "cl.pchardware.eureka.TiendaEurekaApplication",
       "projectName": "cl-pchardware-eureka",
-      "envFile": "${workspaceFolder}/.env"
+      "vmArgs": "-Dcom.sun.management.jmxremote.port=10761 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
+    },
+    {
+      "type": "java",
+      "name": "Debug API gateway",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/api-gateway",
+      "mainClass": "cl.pchardware.gateway.TiendaGatewayApplication",
+      "projectName": "cl-pchardware-gateway",
+      "vmArgs": "-Dcom.sun.management.jmxremote.port=10900 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false",
+      "preLaunchTask": "Wait for Eureka"
     },
     {
       "type": "java",
@@ -17,7 +27,8 @@
       "cwd": "${workspaceFolder}/ms-usuarios",
       "mainClass": "cl.pchardware.usuarios.TiendaUsuariosApplication",
       "projectName": "cl-pchardware-usuarios",
-      "envFile": "${workspaceFolder}/.env"
+      "vmArgs": "-Dcom.sun.management.jmxremote.port=10901 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false",
+      "preLaunchTask": "Wait for Eureka"
     },
     {
       "type": "java",
@@ -26,7 +37,8 @@
       "cwd": "${workspaceFolder}/ms-catalogo",
       "mainClass": "cl.pchardware.catalogo.TiendaCatalogoApplication",
       "projectName": "cl-pchardware-catalogo",
-      "envFile": "${workspaceFolder}/.env"
+      "vmArgs": "-Dcom.sun.management.jmxremote.port=10902 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false",
+      "preLaunchTask": "Wait for Eureka"
     },
     {
       "type": "java",
@@ -35,7 +47,8 @@
       "cwd": "${workspaceFolder}/ms-stock",
       "mainClass": "cl.pchardware.stock.TiendaStockApplication",
       "projectName": "cl-pchardware-stock",
-      "envFile": "${workspaceFolder}/.env"
+      "vmArgs": "-Dcom.sun.management.jmxremote.port=10903 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false",
+      "preLaunchTask": "Wait for Eureka"
     },
     {
       "type": "java",
@@ -44,7 +57,8 @@
       "cwd": "${workspaceFolder}/ms-pedidos",
       "mainClass": "cl.pchardware.pedidos.TiendaPedidosApplication",
       "projectName": "cl-pchardware-pedidos",
-      "envFile": "${workspaceFolder}/.env"
+      "vmArgs": "-Dcom.sun.management.jmxremote.port=10904 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false",
+      "preLaunchTask": "Wait for Eureka"
     },
     {
       "type": "java",
@@ -53,7 +67,8 @@
       "cwd": "${workspaceFolder}/ms-pagos",
       "mainClass": "cl.pchardware.pagos.TiendaPagosApplication",
       "projectName": "cl-pchardware-pagos",
-      "envFile": "${workspaceFolder}/.env"
+      "vmArgs": "-Dcom.sun.management.jmxremote.port=10905 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false",
+      "preLaunchTask": "Wait for Eureka"
     },
     {
       "type": "java",
@@ -62,7 +77,8 @@
       "cwd": "${workspaceFolder}/ms-envios",
       "mainClass": "cl.pchardware.envios.TiendaEnviosApplication",
       "projectName": "cl-pchardware-envios",
-      "envFile": "${workspaceFolder}/.env"
+      "vmArgs": "-Dcom.sun.management.jmxremote.port=10906 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false",
+      "preLaunchTask": "Wait for Eureka"
     },
     {
       "type": "java",
@@ -71,7 +87,8 @@
       "cwd": "${workspaceFolder}/ms-tasacion",
       "mainClass": "cl.pchardware.tasacion.TiendaTasacionApplication",
       "projectName": "cl-pchardware-tasacion",
-      "envFile": "${workspaceFolder}/.env"
+      "vmArgs": "-Dcom.sun.management.jmxremote.port=10907 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false",
+      "preLaunchTask": "Wait for Eureka"
     },
     {
       "type": "java",
@@ -80,7 +97,8 @@
       "cwd": "${workspaceFolder}/ms-garantias",
       "mainClass": "cl.pchardware.garantias.TiendaGarantiasApplication",
       "projectName": "cl-pchardware-garantias",
-      "envFile": "${workspaceFolder}/.env"
+      "vmArgs": "-Dcom.sun.management.jmxremote.port=10908 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false",
+      "preLaunchTask": "Wait for Eureka"
     },
     {
       "type": "java",
@@ -89,7 +107,8 @@
       "cwd": "${workspaceFolder}/ms-devoluciones",
       "mainClass": "cl.pchardware.devoluciones.TiendaDevolucionesApplication",
       "projectName": "cl-pchardware-devoluciones",
-      "envFile": "${workspaceFolder}/.env"
+      "vmArgs": "-Dcom.sun.management.jmxremote.port=10909 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false",
+      "preLaunchTask": "Wait for Eureka"
     },
     {
       "type": "java",
@@ -98,7 +117,8 @@
       "cwd": "${workspaceFolder}/ms-soporte",
       "mainClass": "cl.pchardware.soporte.TiendaSoporteApplication",
       "projectName": "cl-pchardware-soporte",
-      "envFile": "${workspaceFolder}/.env"
+      "vmArgs": "-Dcom.sun.management.jmxremote.port=10910 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false",
+      "preLaunchTask": "Wait for Eureka"
     },
     {
       "type": "java",
@@ -107,7 +127,8 @@
       "cwd": "${workspaceFolder}/ms-armado",
       "mainClass": "cl.pchardware.armado.TiendaArmadoApplication",
       "projectName": "cl-pchardware-armado",
-      "envFile": "${workspaceFolder}/.env"
+      "vmArgs": "-Dcom.sun.management.jmxremote.port=10911 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false",
+      "preLaunchTask": "Wait for Eureka"
     },
     {
       "type": "java",
@@ -116,7 +137,8 @@
       "cwd": "${workspaceFolder}/ms-notificaciones",
       "mainClass": "cl.pchardware.notificaciones.TiendaNotificacionesApplication",
       "projectName": "cl-pchardware-notificaciones",
-      "envFile": "${workspaceFolder}/.env"
+      "vmArgs": "-Dcom.sun.management.jmxremote.port=10912 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false",
+      "preLaunchTask": "Wait for Eureka"
     }
   ],
   "compounds": [
@@ -124,6 +146,7 @@
       "name": "Debug All Services",
       "configurations": [
         "Debug Eureka",
+        "Debug API gateway",
         "Debug ms-usuarios",
         "Debug ms-catalogo",
         "Debug ms-stock",

@@ -39,6 +39,16 @@ public class TicketSoporteService {
         );
     }
 
+        @Transactional(readOnly = true)
+        public List<TicketSoporteResponse> findByIdUsuario(Integer idUsuario) {
+
+                Objects.requireNonNull(idUsuario, "ID Usuario no puede ser nulo");
+
+                List<TicketSoporte> tickets = ticketRepository.findByIdUsuario(idUsuario);
+
+                return ticketMapper.toResponseList(tickets);
+        }
+
     @Transactional
     public TicketSoporteResponse create(
             TicketSoporteRequest request
@@ -47,7 +57,7 @@ public class TicketSoporteService {
         TicketSoporte ticket =
                 ticketMapper.toEntity(request);
 
-        Objects.requireNonNull(ticket, "TicketSoporte must not be null");
+        Objects.requireNonNull(ticket, "Ticket Soporte no puede ser nulo");
 
         return ticketMapper.toResponse(
                 ticketRepository.save(ticket)
@@ -80,9 +90,9 @@ public class TicketSoporteService {
 
         private @NonNull TicketSoporte getTicketById(Integer id) {
 
-        Objects.requireNonNull(id, "id must not be null");
+        Objects.requireNonNull(id, "ID no puede ser nulo");
 
-        return ticketRepository.findById(id)
+        TicketSoporte ticket = ticketRepository.findById(id)
                 .orElseThrow(() ->
                         new EntityNotFoundException(
                                 "TicketSoporte",
@@ -90,5 +100,7 @@ public class TicketSoporteService {
                                 id
                         )
                 );
+
+        return Objects.requireNonNull(ticket);
     }
 }

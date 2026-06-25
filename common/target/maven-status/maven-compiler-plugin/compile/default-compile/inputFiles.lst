@@ -1,6 +1,8 @@
 C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\exception\ReferentialIntegrityException.java
+C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\security\JwtAuthenticationFilter.java
 C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\event\GarantiaCreadaEvent.java
 C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\CommonAutoConfiguration.java
+C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\config\OpenApiConfig.java
 C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\exception\ApiError.java
 C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\event\NotificacionEvent.java
 C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\event\UsuarioCreatedEvent.java
@@ -8,7 +10,10 @@ C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\event\Pedi
 C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\event\PedidoEvent.java
 C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\exception\GlobalExceptionHandler.java
 C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\event\PagoAprobadoEvent.java
+C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\security\JwtProperties.java
 C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\event\UsuarioUpdatedEvent.java
+C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\security\JwtTokenProvider.java
+C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\security\TokenBlacklistService.java
 C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\event\UsuarioEvent.java
 C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\event\DevolucionCreadaEvent.java
 C:\SoftwareTiendaPcHardware\common\src\main\java\cl\pchardware\common\event\PedidoActualizadoEvent.java
