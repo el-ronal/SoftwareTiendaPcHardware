@@ -1,6 +1,7 @@
 package cl.pchardware.soporte.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.hateoas.CollectionModel;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -52,6 +53,11 @@ public class TicketSoporteController {
         );
         
         return ResponseEntity.ok(collection);
+    public ResponseEntity<List<TicketSoporteResponse>> findByUsuario(@PathVariable Integer idUsuario) {
+        List<TicketSoporteResponse> tickets = ticketService.findAll().stream()
+            .filter(ticket -> ticket.getIdUsuario().equals(idUsuario))
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(tickets);
     }
 
     @PostMapping
