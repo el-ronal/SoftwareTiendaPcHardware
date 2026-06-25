@@ -1,6 +1,10 @@
 package cl.pchardware.devoluciones.controller;
 
 import java.util.List;
+import org.springframework.hateoas.CollectionModel;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,8 +44,19 @@ public class SolicitudDevolucionController {
             @ApiResponse(responseCode = "200", description = "Lista obtenida exitosamente", content = @Content(array = @ArraySchema(schema = @Schema(implementation = SolicitudDevolucionResponse.class))))
     })
     @GetMapping
-    public ResponseEntity<List<SolicitudDevolucionResponse>> findAll() {
-        return ResponseEntity.ok(solicitudService.findAll());
+    public ResponseEntity<CollectionModel<SolicitudDevolucionResponse>> findAll() {
+        List<SolicitudDevolucionResponse> devoluciones = solicitudService.findAll();
+
+        // Agrega links a cada elemento de la lista
+        devoluciones.forEach(this::addLinks);
+
+        // CollectionModel envuelve la lista y le agrega un link "self" al coleccion completa
+        CollectionModel<SolicitudDevolucionResponse> collection = CollectionModel.of(
+            devoluciones,
+            linkTo(methodOn(SolicitudDevolucionController.class).findAll()).withSelfRel()
+        );
+
+        return ResponseEntity.ok(collection);
     }
 
     @Operation(summary = "Obtener solicitud de devolución por ID", description = "Retorna una solicitud de devolución según su identificador único")
@@ -52,10 +67,10 @@ public class SolicitudDevolucionController {
     @GetMapping("/{id}")
     public ResponseEntity<SolicitudDevolucionResponse> findById(
             @Parameter(description = "ID de la solicitud de devolución", required = true, example = "1") @PathVariable Integer id) {
-        return ResponseEntity.ok(solicitudService.findById(id));
+        return ResponseEntity.ok(addLinks(solicitudService.findById(id)));
     }
 
-    @Operation(summary = "Obtener solicitud de devolución por ISBN", description = "Retorna una solicitud de devolución según su código ISBN")
+    @Operation(summary = "Obtener solicitud de devolución por ID", description = "Retorna una solicitud de devolución según su código ID")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Solicitud encontrada", content = @Content(schema = @Schema(implementation = SolicitudDevolucionResponse.class))),
             @ApiResponse(responseCode = "404", description = "Solicitud no encontrada", content = @Content)
@@ -64,6 +79,20 @@ public class SolicitudDevolucionController {
     public ResponseEntity<List<SolicitudDevolucionResponse>> findByPedido(
             @Parameter(description = "ID del pedido", required = true, example = "1") @PathVariable Integer idPedido) {
         return ResponseEntity.ok(solicitudService.findByPedido(idPedido));
+    
+      public ResponseEntity<CollectionModel<SolicitudDevolucionResponse>> findByPedido(@PathVariable Integer idPedido) {
+        List<SolicitudDevolucionResponse> devoluciones = solicitudService.findByPedido(idPedido);
+
+        // Agrega links a cada elemento de la lista
+        devoluciones.forEach(this::addLinks);
+
+        // CollectionModel envuelve la lista y le agrega un link "self" al coleccion completa
+        CollectionModel<SolicitudDevolucionResponse> collection = CollectionModel.of(
+            devoluciones,
+            linkTo(methodOn(SolicitudDevolucionController.class).findByPedido(idPedido)).withSelfRel()
+        );
+
+        return ResponseEntity.ok(collection);
     }
 
     @Operation(summary = "Crear un nuevo solicitud de devolución", description = "Registra un nuevo solicitud de devolución en el sistema")
@@ -74,7 +103,7 @@ public class SolicitudDevolucionController {
     @PostMapping
     public ResponseEntity<SolicitudDevolucionResponse> create(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Datos de la solicitud de devolución a crear", required = true, content = @Content(schema = @Schema(implementation = SolicitudDevolucionRequest.class))) @Valid @RequestBody SolicitudDevolucionRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(solicitudService.create(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(addLinks(solicitudService.create(request)));
     }
 
     @Operation(summary = "Actualizar un libro", description = "Actualiza los datos de un libro existente")
@@ -87,7 +116,7 @@ public class SolicitudDevolucionController {
     public ResponseEntity<SolicitudDevolucionResponse> update(
             @Parameter(description = "ID de la solicitud de devolución a actualizar", required = true, example = "1") @PathVariable Integer id,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Nuevos datos de la solicitud de devolución", required = true, content = @Content(schema = @Schema(implementation = SolicitudDevolucionRequest.class))) @Valid @RequestBody SolicitudDevolucionRequest request) {
-        return ResponseEntity.ok(solicitudService.update(id, request));
+        return ResponseEntity.ok(addLinks(solicitudService.update(id, request)));
     }
 
     @Operation(summary = "Eliminar un libro", description = "Elimina un libro del catálogo por su ID")
@@ -100,5 +129,31 @@ public class SolicitudDevolucionController {
             @Parameter(description = "ID del libro a eliminar", required = true, example = "1") @PathVariable Integer id) {
         solicitudService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    private SolicitudDevolucionResponse addLinks(SolicitudDevolucionResponse devolucion) {
+        Integer id = devolucion.getIdDevolucion();
+        Integer idPedido = devolucion.getIdPedido();
+
+        devolucion.add(linkTo(methodOn(SolicitudDevolucionController.class).findById(id)).withSelfRel());
+        
+        if (idPedido != null) {
+            devolucion.add(linkTo(methodOn(SolicitudDevolucionController.class).findByPedido(idPedido))
+                    .withRel("findByPedido").withTitle("GET - Buscar por pedido"));
+        }
+        
+        devolucion.add(linkTo(methodOn(SolicitudDevolucionController.class).create(null))
+                .withRel("create").withTitle("POST - Crear devolucion"));
+
+        devolucion.add(linkTo(methodOn(SolicitudDevolucionController.class).update(id, null))
+                .withRel("update").withTitle("PUT - Actualizar devolucion"));
+
+        devolucion.add(linkTo(methodOn(SolicitudDevolucionController.class).deleteById(id))
+                .withRel("delete").withTitle("DELETE - Eliminar devolucion"));
+
+        devolucion.add(linkTo(methodOn(SolicitudDevolucionController.class).findAll())
+                .withRel("all").withTitle("GET - Listado de devoluciones"));
+
+        return devolucion;
     }
 }

@@ -2,6 +2,11 @@ package cl.pchardware.armado.controller;
 
 import java.util.List;
 
+
+import org.springframework.hateoas.CollectionModel;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -41,8 +46,19 @@ public class TecnicoArmadoController {
     })
 
     @GetMapping
-    public ResponseEntity<List<TecnicoArmadoResponse>> findAll() {
-        return ResponseEntity.ok(tecnicoService.findAll());
+    public ResponseEntity<CollectionModel<TecnicoArmadoResponse>> findAll() {
+        List<TecnicoArmadoResponse> tecnicos = tecnicoService.findAll();
+
+        // Agrega links a cada elemento de la lista
+        tecnicos.forEach(this::addLinks);
+
+        // CollectionModel envuelve la lista y le agrega un link "self" al coleccion completa
+        CollectionModel<TecnicoArmadoResponse> collection = CollectionModel.of(
+            tecnicos,
+            linkTo(methodOn(TecnicoArmadoController.class).findAll()).withSelfRel()
+        );
+
+        return ResponseEntity.ok(collection);
     }
 
     @Operation(summary = "Obtener técnico de armado por ID", description = "Retorna un técnico de armado según su identificador único")
@@ -53,7 +69,7 @@ public class TecnicoArmadoController {
     @GetMapping("/{id}")
     public ResponseEntity<TecnicoArmadoResponse> findById(
             @Parameter(description = "ID del técnico de armado", required = true, example = "1") @PathVariable Integer id) {
-        return ResponseEntity.ok(tecnicoService.findById(id));
+        return ResponseEntity.ok(addLinks(tecnicoService.findById(id)));
     }
 
     @Operation(summary = "Crear un nuevo técnico de armado", description = "Registra un nuevo técnico de armado en el catálogo")
@@ -64,7 +80,7 @@ public class TecnicoArmadoController {
     @PostMapping
     public ResponseEntity<TecnicoArmadoResponse> create(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Datos del técnico de armado a crear", required = true, content = @Content(schema = @Schema(implementation = TecnicoArmadoRequest.class))) @Valid @RequestBody TecnicoArmadoRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(tecnicoService.create(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(addLinks(tecnicoService.create(request)));
     }
 
     @Operation(summary = "Actualizar un técnico de armado", description = "Actualiza los datos de un técnico de armado existente")
@@ -77,7 +93,7 @@ public class TecnicoArmadoController {
     public ResponseEntity<TecnicoArmadoResponse> update(
             @Parameter(description = "ID del técnico de armado a actualizar", required = true, example = "1") @PathVariable Integer id,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Nuevos datos del técnico de armado", required = true, content = @Content(schema = @Schema(implementation = TecnicoArmadoRequest.class))) @Valid @RequestBody TecnicoArmadoRequest request) {
-        return ResponseEntity.ok(tecnicoService.update(id, request));
+        return ResponseEntity.ok(addLinks(tecnicoService.update(id, request)));
     }
 
     @Operation(summary = "Eliminar un técnico de armado", description = "Elimina un técnico de armado del catálogo por su ID")
@@ -92,5 +108,25 @@ public class TecnicoArmadoController {
 
         tecnicoService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    private TecnicoArmadoResponse addLinks(TecnicoArmadoResponse tecnico) {
+        Integer id = tecnico.getIdTecnico();
+
+        tecnico.add(linkTo(methodOn(TecnicoArmadoController.class).findById(id)).withSelfRel());
+        
+        tecnico.add(linkTo(methodOn(TecnicoArmadoController.class).create(null))
+                .withRel("create").withTitle("POST - Crear tecnico"));
+
+        tecnico.add(linkTo(methodOn(TecnicoArmadoController.class).update(id, null))
+                .withRel("update").withTitle("PUT - Actualizar tecnico"));
+
+        tecnico.add(linkTo(methodOn(TecnicoArmadoController.class).deleteById(id))
+                .withRel("delete").withTitle("DELETE - Eliminar tecnico"));
+        
+        tecnico.add(linkTo(methodOn(TecnicoArmadoController.class).findAll())
+                .withRel("all").withTitle("GET - Obtener todos los tecnicos"));
+
+        return tecnico;
     }
 }

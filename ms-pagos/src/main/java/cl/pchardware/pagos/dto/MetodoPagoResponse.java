@@ -5,13 +5,16 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.EqualsAndHashCode;
+import org.springframework.hateoas.RepresentationModel;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MetodoPagoResponse {
+@EqualsAndHashCode(callSuper = false)
+public class MetodoPagoResponse extends RepresentationModel<MetodoPagoResponse> {
 
     private Integer idMetodo;
     private String codigo;

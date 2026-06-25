@@ -1,12 +1,17 @@
 package cl.pchardware.catalogo.dto;
 
+import java.util.List;
+
+import org.springframework.hateoas.RepresentationModel;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
-public class ProductoResponse {
+@EqualsAndHashCode(callSuper = false)
+public class ProductoResponse extends RepresentationModel<ProductoResponse> {
 
     private String sku;
     private Integer precioClp;
     private MarcaResponse marca;
-    private CategoriaResponse categoria;
+    private List<CategoriaResponse> categorias;
 }

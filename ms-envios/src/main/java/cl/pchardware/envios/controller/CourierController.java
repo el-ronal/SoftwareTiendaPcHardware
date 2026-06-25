@@ -1,6 +1,9 @@
 package cl.pchardware.envios.controller;
 
 import java.util.List;
+import org.springframework.hateoas.CollectionModel;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,8 +44,19 @@ public class CourierController {
             @ApiResponse(responseCode = "200", description = "Lista obtenida exitosamente", content = @Content(array = @ArraySchema(schema = @Schema(implementation = CourierResponse.class))))
     })
     @GetMapping
-    public ResponseEntity<List<CourierResponse>> findAll() {
-        return ResponseEntity.ok(courierService.findAll());
+    public ResponseEntity<CollectionModel<CourierResponse>> findAll() {
+        List<CourierResponse> couriers = courierService.findAll();
+
+        // Agrega links a cada elemento de la lista
+        couriers.forEach(this::addLinks);
+
+        // CollectionModel envuelve la lista y le agrega un link "self" al coleccion completa
+        CollectionModel<CourierResponse> collection = CollectionModel.of(
+            couriers,
+            linkTo(methodOn(CourierController.class).findAll()).withSelfRel()
+        );
+
+        return ResponseEntity.ok(collection);
     }
 
     @Operation(summary = "Obtener courier por ID", description = "Retorna un courier según su identificador único")
@@ -53,7 +67,7 @@ public class CourierController {
     @GetMapping("/{id}")
     public ResponseEntity<CourierResponse> findById(
             @Parameter(description = "ID del courier", required = true, example = "1") @PathVariable @NonNull Integer id) {
-        return ResponseEntity.ok(courierService.findById(id));
+        return ResponseEntity.ok(addLinks(courierService.findById(id)));
     }
 
     @Operation(summary = "Obtener courier por código", description = "Retorna un courier según su código único")
@@ -64,7 +78,7 @@ public class CourierController {
     @GetMapping("/codigo/{codigo}")
     public ResponseEntity<CourierResponse> findByCodigo(
             @Parameter(description = "Código del courier", required = true, example = "COUR123") @PathVariable String codigo) {
-        return ResponseEntity.ok(courierService.findByCodigo(codigo));
+        return ResponseEntity.ok(addLinks(courierService.findByCodigo(codigo)));
     }
 
     @Operation(summary = "Crear un nuevo courier", description = "Registra un nuevo courier en el sistema")
@@ -76,7 +90,7 @@ public class CourierController {
     public ResponseEntity<CourierResponse> create(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Datos del courier a crear", required = true, content = @Content(schema = @Schema(implementation = CourierRequest.class))) @Valid @RequestBody CourierRequest request) {
         CourierResponse creado = courierService.create(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(creado);
+        return ResponseEntity.status(HttpStatus.CREATED).body(addLinks(creado));
     }
 
     @Operation(summary = "Actualizar un courier", description = "Actualiza los datos de un courier existente")
@@ -89,7 +103,7 @@ public class CourierController {
     public ResponseEntity<CourierResponse> update(
             @Parameter(description = "ID del courier a actualizar", required = true, example = "1") @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Nuevos datos del courier", required = true, content = @Content(schema = @Schema(implementation = CourierRequest.class))) @PathVariable @NonNull Integer id,
             @Valid @RequestBody CourierRequest request) {
-        return ResponseEntity.ok(courierService.update(id, request));
+        return ResponseEntity.ok(addLinks(courierService.update(id, request)));
     }
 
     @Operation(summary = "Eliminar un courier", description = "Elimina un courier del sistema por su ID")
@@ -102,5 +116,31 @@ public class CourierController {
             @Parameter(description = "ID del courier a eliminar", required = true, example = "1") @PathVariable @NonNull Integer id) {
         courierService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    private CourierResponse addLinks(CourierResponse courier) {
+        Integer id = courier.getIdCourier();
+        String codigo = courier.getCodigo();
+
+        courier.add(linkTo(methodOn(CourierController.class).findById(id)).withSelfRel());
+        
+        if (codigo != null) {
+            courier.add(linkTo(methodOn(CourierController.class).findByCodigo(codigo))
+                    .withRel("findByCodigo").withTitle("GET - Buscar por código"));
+        }
+        
+        courier.add(linkTo(methodOn(CourierController.class).create(null))
+                .withRel("create").withTitle("POST - Crear courier"));
+
+        courier.add(linkTo(methodOn(CourierController.class).update(id, null))
+                .withRel("update").withTitle("PUT - Actualizar courier"));
+
+        courier.add(linkTo(methodOn(CourierController.class).deleteById(id))
+                .withRel("delete").withTitle("DELETE - Eliminar courier"));
+        
+        courier.add(linkTo(methodOn(CourierController.class).findAll())
+                .withRel("all").withTitle("GET - Listado de couriers"));
+
+        return courier;
     }
 }
