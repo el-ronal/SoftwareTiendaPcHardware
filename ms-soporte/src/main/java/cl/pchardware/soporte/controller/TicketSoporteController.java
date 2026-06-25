@@ -1,6 +1,7 @@
 package cl.pchardware.soporte.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,10 @@ public class TicketSoporteController {
 
     @GetMapping("/usuario/{idUsuario}")
     public ResponseEntity<List<TicketSoporteResponse>> findByUsuario(@PathVariable Integer idUsuario) {
-        return ResponseEntity.ok(ticketService.findByUsuario(idUsuario));
+        List<TicketSoporteResponse> tickets = ticketService.findAll().stream()
+            .filter(ticket -> ticket.getIdUsuario().equals(idUsuario))
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(tickets);
     }
 
     @PostMapping
