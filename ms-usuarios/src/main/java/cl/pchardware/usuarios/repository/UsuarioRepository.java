@@ -14,7 +14,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     Optional<Usuario> findByEmail(String email);
     
     // Útil para validaciones rápidas al registrar un usuario
-    // boolean existsByEmail(String email);
+    boolean existsByEmail(String email);
     
     // Aprovecha el índice 'idx_usuario_estado' que creaste en el script SQL
     List<Usuario> findByEstado(String estado);
