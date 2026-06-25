@@ -24,15 +24,15 @@ import lombok.RequiredArgsConstructor;
  *
  * Matriz de autorización:
  * ┌────────────────────────────┬────────┬────────────────────────────────────┐
- * │ Endpoint                   │ Método │ Acceso                             │
+ * │ Endpoint │ Método │ Acceso │
  * ├────────────────────────────┼────────┼────────────────────────────────────┤
- * │ /api/v1/auth/**            │ ALL    │ Público (sin token)                │
- * │ /actuator/**               │ ALL    │ Público (monitoreo)                │
- * │ /api/v1/pedidos/**         │ GET    │ ADMIN, TASADOR                     │
- * │ /api/v1/pedidos/**         │ POST   │ ADMIN                              │
- * │ /api/v1/pedidos/**         │ PUT    │ ADMIN                              │
- * │ /api/v1/pedidos/**         │ DELETE │ ADMIN                              │
- * │ Cualquier otro             │ ALL    │ Autenticado (con token válido)     │
+ * │ /api/v1/auth/** │ ALL │ Público (sin token) │
+ * │ /actuator/** │ ALL │ Público (monitoreo) │
+ * │ /api/v1/pedidos/** │ GET │ ADMIN, TASADOR │
+ * │ /api/v1/pedidos/** │ POST │ ADMIN │
+ * │ /api/v1/pedidos/** │ PUT │ ADMIN │
+ * │ /api/v1/pedidos/** │ DELETE │ ADMIN │
+ * │ Cualquier otro │ ALL │ Autenticado (con token válido) │
  * └────────────────────────────┴────────┴────────────────────────────────────┘
  */
 @Configuration
@@ -45,29 +45,39 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
-            .authorizeHttpRequests(auth -> auth
-                // Actuator siempre público
-                .requestMatchers("/actuator/**").permitAll()
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
 
-                // Lectura de pedidos: cualquier rol autenticado
-                .requestMatchers(HttpMethod.GET, "/api/v1/pedidos/**")
-                    .hasAnyRole("Admin", "Tasador", "Cliente")
+                        // [SWAGGER-INI]
+                        // PERMITIR RUTAS PÚBLICAS DE SWAGGER / SPRINGDOC
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/v3/api-docs.yaml",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/swagger-resources/**",
+                                "/webjars/**",
+                                "/favicon.ico")
+                        .permitAll()
+                        // [SWAGGER-FIN]
+                        // Actuator siempre público
+                        .requestMatchers("/actuator/**").permitAll()
 
-                // Escritura de pedidos: solo Administrador y Tasador
-                .requestMatchers(HttpMethod.POST, "/api/v1/pedidos/**")
-                    .hasAnyRole("Admin", "Tasador")
-                .requestMatchers(HttpMethod.PUT, "/api/v1/pedidos/**")
-                    .hasAnyRole("Admin", "Tasador")
-                .requestMatchers(HttpMethod.DELETE, "/api/v1/pedidos/**")
-                    .hasAnyRole("Admin", "Tasador")
+                        // Lectura de pedidos: cualquier rol autenticado
+                        .requestMatchers(HttpMethod.GET, "/api/v1/pedidos/**")
+                        .hasAnyRole("Admin", "Tasador", "Cliente")
 
-                .anyRequest().authenticated()
-            )
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                        // Escritura de pedidos: solo Administrador y Tasador
+                        .requestMatchers(HttpMethod.POST, "/api/v1/pedidos/**")
+                        .hasAnyRole("Admin", "Tasador")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/pedidos/**")
+                        .hasAnyRole("Admin", "Tasador")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/pedidos/**")
+                        .hasAnyRole("Admin", "Tasador")
+
+                        .anyRequest().authenticated())
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

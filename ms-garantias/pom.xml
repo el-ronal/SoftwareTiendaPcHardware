@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <!-- Modelo base de Maven -->
     <modelVersion>4.0.0</modelVersion>
@@ -42,6 +41,14 @@
     <!-- Dependencias necesarias para este microservicio -->
     <dependencies>
 
+        <!-- [SWAGGER-INI] -->
+        <!-- Springdoc OpenAPI: generacion automatica de documentacion Swagger UI -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+        </dependency>
+        <!-- [SWAGGER-FIN] -->
+
         <!-- Modulo Common: excepciones globales y handler compartido -->
         <dependency>
             <groupId>cl.pchardware</groupId>
@@ -71,7 +78,6 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>${com-h2database.version}</version>
         </dependency>
 
         <!-- Validacion con anotaciones como @Valid, @NotNull, etc. -->
@@ -125,6 +131,10 @@
             <optional>true</optional>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
         <!-- Spring HATEOAS -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

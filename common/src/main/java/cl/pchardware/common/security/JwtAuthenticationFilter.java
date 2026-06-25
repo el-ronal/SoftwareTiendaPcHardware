@@ -3,13 +3,13 @@ package cl.pchardware.common.security;
 import java.io.IOException;
 import java.util.List;
 
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.lang.NonNull;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -22,7 +22,8 @@ import lombok.extern.slf4j.Slf4j;
  * Filtro de autenticación JWT que se ejecuta UNA VEZ por cada petición HTTP.
  *
  * Flujo:
- * 1. Lee el header "Authorization: Bearer <token>", la palabra Bearer significa portador.
+ * 1. Lee el header "Authorization: Bearer <token>", la palabra Bearer significa
+ * portador.
  * 2. Valida el token con JwtTokenProvider
  * 3. Extrae email y rol del token
  * 4. Crea un objeto Authentication y lo inyecta en el SecurityContext
@@ -60,12 +61,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 // 4. Crear authorities con prefijo ROLE_ (convención de Spring Security)
                 List<SimpleGrantedAuthority> authorities = List.of(
-                    new SimpleGrantedAuthority("ROLE_" + rol)
-                );
+                        new SimpleGrantedAuthority("ROLE_" + rol));
 
                 // 5. Crear objeto de autenticación (sin credenciales, ya validadas por JWT)
-                UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(email, null, authorities);
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(email,
+                        null, authorities);
 
                 // 6. Inyectar en el SecurityContext para que Spring Security lo use
                 SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -95,5 +95,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return bearerToken.substring(BEARER_PREFIX.length());
         }
         return null;
+    }
+
+    @Override
+    protected boolean shouldNotFilter(@NonNull HttpServletRequest request) throws ServletException {
+        String path = request.getRequestURI();
+        return path.startsWith("/swagger-ui") ||
+                path.startsWith("/v3/api-docs") ||
+                path.startsWith("/swagger-resources") ||
+                path.startsWith("/webjars") ||
+                path.equals("/favicon.ico") ||
+                path.startsWith("/actuator");
     }
 }

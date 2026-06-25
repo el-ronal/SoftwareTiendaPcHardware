@@ -24,15 +24,15 @@ import lombok.RequiredArgsConstructor;
  *
  * Matriz de autorización:
  * ┌────────────────────────────┬────────┬────────────────────────────────────┐
- * │ Endpoint                   │ Método │ Acceso                             │
+ * │ Endpoint │ Método │ Acceso │
  * ├────────────────────────────┼────────┼────────────────────────────────────┤
- * │ /api/v1/auth/**            │ ALL    │ Público (sin token)                │
- * │ /actuator/**               │ ALL    │ Público (monitoreo)                │
- * │ /api/v1/usuarios/**        │ GET    │ ADMIN, TASADOR                     │
- * │ /api/v1/usuarios/**        │ POST   │ ADMIN                              │
- * │ /api/v1/usuarios/**        │ PUT    │ ADMIN                              │
- * │ /api/v1/usuarios/**        │ DELETE │ ADMIN                              │
- * │ Cualquier otro             │ ALL    │ Autenticado (con token válido)     │
+ * │ /api/v1/auth/** │ ALL │ Público (sin token) │
+ * │ /actuator/** │ ALL │ Público (monitoreo) │
+ * │ /api/v1/usuarios/** │ GET │ ADMIN, TASADOR │
+ * │ /api/v1/usuarios/** │ POST │ ADMIN │
+ * │ /api/v1/usuarios/** │ PUT │ ADMIN │
+ * │ /api/v1/usuarios/** │ DELETE │ ADMIN │
+ * │ Cualquier otro │ ALL │ Autenticado (con token válido) │
  * └────────────────────────────┴────────┴────────────────────────────────────┘
  */
 @Configuration
@@ -53,36 +53,47 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // 1. Desactivar CSRF (no necesario en APIs stateless con JWT)
-            .csrf(csrf -> csrf.disable())
+                // 1. Desactivar CSRF (no necesario en APIs stateless con JWT)
+                .csrf(csrf -> csrf.disable())
 
-            // 2. Política de sesiones: STATELESS (sin HttpSession ni cookies)
-            .sessionManagement(session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
+                // 2. Política de sesiones: STATELESS (sin HttpSession ni cookies)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-            // 3. Reglas de autorización por endpoint
-            .authorizeHttpRequests(auth -> auth
-                // Endpoints públicos (sin token)
-                .requestMatchers("/api/v1/auth/**").permitAll()
-                .requestMatchers("/actuator/**").permitAll()
+                // 3. Reglas de autorización por endpoint
+                .authorizeHttpRequests(auth -> auth
 
-                // Endpoints de usuarios por rol
-                .requestMatchers(HttpMethod.GET, "/api/v1/usuarios/**")
-                    .hasAnyRole("Admin", "Tasador")
-                .requestMatchers(HttpMethod.POST, "/api/v1/usuarios/**")
-                    .hasRole("Admin")
-                .requestMatchers(HttpMethod.PUT, "/api/v1/usuarios/**")
-                    .hasRole("Admin")
-                .requestMatchers(HttpMethod.DELETE, "/api/v1/usuarios/**")
-                    .hasRole("Admin")
+                        // [SWAGGER-INI]
+                        // PERMITIR RUTAS PÚBLICAS DE SWAGGER / SPRINGDOC
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/v3/api-docs.yaml",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/swagger-resources/**",
+                                "/webjars/**",
+                                "/favicon.ico")
+                        .permitAll()
+                        // [SWAGGER-FIN]
 
-                // Todo lo demás requiere autenticación
-                .anyRequest().authenticated()
-            )
+                        // Endpoints públicos (sin token)
+                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
 
-            // 4. Agregar el filtro JWT ANTES del filtro de autenticación por defecto
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                        // Endpoints de usuarios por rol
+                        .requestMatchers(HttpMethod.GET, "/api/v1/usuarios/**")
+                        .hasAnyRole("Admin", "Tasador")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/usuarios/**")
+                        .hasRole("Admin")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/usuarios/**")
+                        .hasRole("Admin")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/usuarios/**")
+                        .hasRole("Admin")
+
+                        // Todo lo demás requiere autenticación
+                        .anyRequest().authenticated())
+
+                // 4. Agregar el filtro JWT ANTES del filtro de autenticación por defecto
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
