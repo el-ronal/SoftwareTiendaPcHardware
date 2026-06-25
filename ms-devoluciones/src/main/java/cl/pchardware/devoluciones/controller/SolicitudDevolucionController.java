@@ -76,11 +76,7 @@ public class SolicitudDevolucionController {
             @ApiResponse(responseCode = "404", description = "Solicitud no encontrada", content = @Content)
     })
     @GetMapping("/pedido/{idPedido}")
-    public ResponseEntity<List<SolicitudDevolucionResponse>> findByPedido(
-            @Parameter(description = "ID del pedido", required = true, example = "1") @PathVariable Integer idPedido) {
-        return ResponseEntity.ok(solicitudService.findByPedido(idPedido));
-    
-      public ResponseEntity<CollectionModel<SolicitudDevolucionResponse>> findByPedido(@PathVariable Integer idPedido) {
+        public ResponseEntity<CollectionModel<SolicitudDevolucionResponse>> findByPedido(@PathVariable Integer idPedido) {
         List<SolicitudDevolucionResponse> devoluciones = solicitudService.findByPedido(idPedido);
 
         // Agrega links a cada elemento de la lista

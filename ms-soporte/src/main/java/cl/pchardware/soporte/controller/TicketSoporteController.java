@@ -34,7 +34,7 @@ public class TicketSoporteController {
             linkTo(methodOn(TicketSoporteController.class).findAll()).withSelfRel()
         );
         
-        return ResponseEntity.ok(collection);
+        return ResponseEntity.ok((CollectionModel<TicketSoporteResponse>) collection);
     }
 
     @GetMapping("/{id}")
@@ -43,21 +43,16 @@ public class TicketSoporteController {
     }
 
     @GetMapping("/usuario/{idUsuario}")
-    public ResponseEntity<CollectionModel<TicketSoporteResponse>> findByUsuario(@PathVariable Integer idUsuario) {
-        List<TicketSoporteResponse> tickets = ticketService.findByUsuario(idUsuario);
+    public ResponseEntity<CollectionModel<TicketSoporteResponse>> findByIdUsuario(@PathVariable Integer idUsuario) {
+        List<TicketSoporteResponse> tickets = ticketService.findByIdUsuario(idUsuario);
         tickets.forEach(this::addLinks);
         
         CollectionModel<TicketSoporteResponse> collection = CollectionModel.of(
             tickets,
-            linkTo(methodOn(TicketSoporteController.class).findByUsuario(idUsuario)).withSelfRel()
+            linkTo(methodOn(TicketSoporteController.class).findByIdUsuario(idUsuario)).withSelfRel()
         );
         
         return ResponseEntity.ok(collection);
-    public ResponseEntity<List<TicketSoporteResponse>> findByUsuario(@PathVariable Integer idUsuario) {
-        List<TicketSoporteResponse> tickets = ticketService.findAll().stream()
-            .filter(ticket -> ticket.getIdUsuario().equals(idUsuario))
-            .collect(Collectors.toList());
-        return ResponseEntity.ok(tickets);
     }
 
     @PostMapping
@@ -83,7 +78,7 @@ public class TicketSoporteController {
         ticket.add(linkTo(methodOn(TicketSoporteController.class).findById(id)).withSelfRel());
         
         if (idUsuario != null) {
-            ticket.add(linkTo(methodOn(TicketSoporteController.class).findByUsuario(idUsuario))
+            ticket.add(linkTo(methodOn(TicketSoporteController.class).findByIdUsuario(idUsuario))
                     .withRel("findByUsuario").withTitle("GET - Buscar por usuario"));
         }
         

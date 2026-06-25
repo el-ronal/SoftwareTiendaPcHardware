@@ -1,1 +1,2 @@
 cl.pchardware.common.CommonAutoConfiguration
+cl.pchardware.common.server.InstanceHeaderAutoConfiguration
