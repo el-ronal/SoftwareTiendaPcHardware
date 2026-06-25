@@ -1,4 +1,4 @@
-package cl.pchardware.usuarios.config;
+package cl.pchardware.pagos.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +15,7 @@ import cl.pchardware.common.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Configuración de Spring Security para ms-usuarios.
+ * Configuración de Spring Security para ms-pagos.
  *
  * Este microservicio actúa como SERVIDOR DE AUTENTICACIÓN:
  * - Expone /api/v1/auth/** como endpoints públicos (login y registro)
@@ -28,10 +28,10 @@ import lombok.RequiredArgsConstructor;
  * ├────────────────────────────┼────────┼────────────────────────────────────┤
  * │ /api/v1/auth/**            │ ALL    │ Público (sin token)                │
  * │ /actuator/**               │ ALL    │ Público (monitoreo)                │
- * │ /api/v1/usuarios/**        │ GET    │ ADMIN, TASADOR                     │
- * │ /api/v1/usuarios/**        │ POST   │ ADMIN                              │
- * │ /api/v1/usuarios/**        │ PUT    │ ADMIN                              │
- * │ /api/v1/usuarios/**        │ DELETE │ ADMIN                              │
+ * │ /api/v1/transacciones/**   │ GET    │ ADMIN, TASADOR                     │
+ * │ /api/v1/transacciones/**   │ POST   │ ADMIN                              │
+ * │ /api/v1/transacciones/**   │ PUT    │ ADMIN                              │
+ * │ /api/v1/transacciones/**   │ DELETE │ ADMIN                              │
  * │ Cualquier otro             │ ALL    │ Autenticado (con token válido)     │
  * └────────────────────────────┴────────┴────────────────────────────────────┘
  */
@@ -42,56 +42,36 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    /**
-     * Cadena de filtros de seguridad.
-     *
-     * Flujo de cada petición HTTP:
-     * 1. JwtAuthenticationFilter (extrae y valida token)
-     * 2. Spring Security verifica reglas de autorización
-     * 3. Si pasa, llega al controlador; si no, devuelve 401 o 403
-     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // 1. Desactivar CSRF (no necesario en APIs stateless con JWT)
             .csrf(csrf -> csrf.disable())
-
-            // 2. Política de sesiones: STATELESS (sin HttpSession ni cookies)
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
-
-            // 3. Reglas de autorización por endpoint
             .authorizeHttpRequests(auth -> auth
-                // Endpoints públicos (sin token)
-                .requestMatchers("/api/v1/auth/**").permitAll()
+                // Actuator siempre público
                 .requestMatchers("/actuator/**").permitAll()
 
-                // Endpoints de usuarios por rol
-                .requestMatchers(HttpMethod.GET, "/api/v1/usuarios/**")
-                    .hasAnyRole("Admin", "Tasador")
-                .requestMatchers(HttpMethod.POST, "/api/v1/usuarios/**")
-                    .hasRole("Admin")
-                .requestMatchers(HttpMethod.PUT, "/api/v1/usuarios/**")
-                    .hasRole("Admin")
-                .requestMatchers(HttpMethod.DELETE, "/api/v1/usuarios/**")
-                    .hasRole("Admin")
+                // Lectura de transacciones: cualquier rol autenticado
+                .requestMatchers(HttpMethod.GET, "/api/v1/transacciones/**")
+                    .hasAnyRole("Admin", "Tasador", "Cliente")
 
-                // Todo lo demás requiere autenticación
+                // Escritura de transacciones: solo Administrador
+                .requestMatchers(HttpMethod.POST, "/api/v1/transacciones/**")
+                    .hasAnyRole("Admin")
+                .requestMatchers(HttpMethod.PUT, "/api/v1/transacciones/**")
+                    .hasAnyRole("Admin")
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/transacciones/**")
+                    .hasAnyRole("Admin")
+
                 .anyRequest().authenticated()
             )
-
-            // 4. Agregar el filtro JWT ANTES del filtro de autenticación por defecto
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    /**
-     * Bean para codificar contraseñas con BCrypt.
-     * BCrypt genera un salt aleatorio automáticamente y produce hashes
-     * de 60 caracteres que incluyen el salt (auto-contenidos).
-     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
