@@ -1,5 +1,5 @@
 server:
-  port: 9006
+  port: 0
   error:
     include-stacktrace: never
 # [SWAGGER-INI] 
