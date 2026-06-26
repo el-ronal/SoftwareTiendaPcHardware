@@ -1,5 +1,6 @@
 cl\pchardware\common\config\OpenApiConfig.class
 cl\pchardware\common\event\UsuarioEvent$UsuarioEventBuilder.class
+cl\pchardware\common\server\InstanceHeaderAutoConfiguration.class
 cl\pchardware\common\event\PedidoEvent.class
 cl\pchardware\common\event\UsuarioCreatedEvent$UsuarioCreatedEventBuilderImpl.class
 cl\pchardware\common\event\UsuarioDeletedEvent$UsuarioDeletedEventBuilderImpl.class
@@ -18,6 +19,7 @@ cl\pchardware\common\event\GarantiaCreadaEvent.class
 cl\pchardware\common\CommonAutoConfiguration.class
 cl\pchardware\common\security\JwtTokenProvider.class
 cl\pchardware\common\event\UsuarioUpdatedEvent$UsuarioUpdatedEventBuilder.class
+cl\pchardware\common\server\InstanceHeaderFilter.class
 cl\pchardware\common\event\PedidoCreadoEvent.class
 cl\pchardware\common\event\UsuarioDeletedEvent$UsuarioDeletedEventBuilder.class
 cl\pchardware\common\event\PagoAprobadoEvent.class

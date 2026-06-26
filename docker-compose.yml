@@ -1,47 +1,424 @@
-version: '3.8'
+# ============================================================
+# Docker Compose - Sistema Biblioteca Triskeledu (completo)
+# ============================================================
+# Levanta toda la infraestructura + microservicios Java.
+#
+# Orden de arranque garantizado por healthchecks:
+#   1. postgres, kafka           -> arrancan en paralelo
+#   2. eureka-server             -> arranca en paralelo con infra
+#   3. api-gateway               -> espera a eureka (healthy)
+#   4. ms-usuarios, ms-catalogo, -> esperan a eureka + postgres
+#      ms-stock                  + kafka + api-gateway
+# ============================================================
 
 services:
 
+  # -- Infraestructura: Base de Datos --------------------------
   postgres:
     image: postgres
-    container_name: postgres_rdbms
+    container_name: postgres-rdbms
     ports:
       - "5433:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: "123"
-      POSTGRES_DB: tienda
+      POSTGRES_DB: main_postgres_db
     volumes:
       - ./init-multi-db:/docker-entrypoint-initdb.d
-      # ↑ PostgreSQL ejecuta automáticamente en orden alfabético
-      #   todos los .sql que encuentre en esa carpeta al primer arranque.
-      #   Por eso los scripts están numerados 00, 01, 02...
+    networks:
+      - tienda-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
 
+  # -- Infraestructura: Mensajeria -----------------------------
   kafka:
     image: confluentinc/cp-kafka:latest
-    container_name: kafka_broker
+    container_name: kafka-broker
     ports:
       - "9092:9092"
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka_broker:9093
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka-broker:9093
       KAFKA_LISTENERS: INTERNAL://0.0.0.0:29092,EXTERNAL://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka_broker:29092,EXTERNAL://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-broker:29092,EXTERNAL://localhost:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       CLUSTER_ID: "MkU3OEVBNTcwNTJENDM2Qk"
+    networks:
+      - tienda-network
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092 > /dev/null 2>&1"]
+      interval: 10s
+      timeout: 10s
+      retries: 15
+      start_period: 30s
 
+  # -- Infraestructura: Kafka UI -------------------------------
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
-    container_name: kafka_ui
+    container_name: kafka-ui
     depends_on:
-      - kafka
+      kafka:
+        condition: service_healthy
     ports:
       - "8080:8080"
     environment:
       KAFKA_CLUSTERS_0_NAME: local
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka_broker:29092
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-broker:29092
+    networks:
+      - tienda-network
+
+  # -- Descubrimiento: Eureka Server ---------------------------
+  eureka-server:
+    build: ./eureka
+    image: tienda-eureka-server
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+    networks:
+      - tienda-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8761/actuator/health | grep -q '\"status\":\"UP\"' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 40s
+
+  # -- Enrutamiento: API Gateway -------------------------------
+  api-gateway:
+    build: ./api-gateway
+    image: tienda-api-gateway
+    container_name: api-gateway
+    ports:
+      - "9000:9000"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+    networks:
+      - tienda-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:9000/actuator/health | grep -q '\"status\":\"UP\"' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 40s
+
+  # -- Microservicio: Usuarios / Autenticacion -----------------
+  ms-usuarios:
+    build: ./ms-usuarios
+    image: tienda-ms-usuarios
+    container_name: ms-usuarios
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      api-gateway:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SERVER_PORT: 9001
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-rdbms:5432/usuarios
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: "123"
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-broker:29092
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+    networks:
+      - tienda-network
+
+  # -- Microservicio: Catalogo de Libros -----------------------
+  ms-catalogo:
+    build: ./ms-catalogo
+    image: tienda-ms-catalogo
+    container_name: ms-catalogo
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      api-gateway:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SERVER_PORT: 9002
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-rdbms:5432/catalogo
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: "123"
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-broker:29092
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+    networks:
+      - tienda-network
+
+  # -- Microservicio: pagos Fisicos -------------------------
+  ms-stock:
+    build: ./ms-stock
+    image: tienda-ms-stock
+    container_name: ms-stock
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      api-gateway:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SERVER_PORT: 9003
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-rdbms:5432/stock
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: "123"
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-broker:29092
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+    networks:
+      - tienda-network
+  ms-pedidos:
+    build: ./ms-pedidos
+    image: tienda-ms-pedidos
+    container_name: ms-pedidos
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      api-gateway:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SERVER_PORT: 9004
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-rdbms:5432/pedidos
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: "123"
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-broker:29092
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+    networks:
+      - tienda-network
+  ms-pagos:
+    build: ./ms-pagos
+    image: tienda-ms-pagos
+    container_name: ms-pagos
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      api-gateway:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SERVER_PORT: 9005
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-rdbms:5432/pagos
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: "123"
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-broker:29092
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+    networks:
+      - tienda-network
+  ms-envios:
+    build: ./ms-envios
+    image: tienda-ms-envios
+    container_name: ms-envios
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      api-gateway:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SERVER_PORT: 9006
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-rdbms:5432/envios
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: "123"
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-broker:29092
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+    networks:
+      - tienda-network
+  ms-tasacion:
+    build: ./ms-tasacion
+    image: tienda-ms-tasacion
+    container_name: ms-tasacion
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      api-gateway:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SERVER_PORT: 9007
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-rdbms:5432/tasacion
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: "123"
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-broker:29092
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+    networks:
+      - tienda-network
+
+  ms-garantias:
+    build: ./ms-garantias
+    image: tienda-ms-garantias
+    container_name: ms-garantias
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      api-gateway:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SERVER_PORT: 9008
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-rdbms:5432/garantias
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: "123"
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-broker:29092
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+    networks:
+      - tienda-network
+
+  ms-devoluciones:
+    build: ./ms-devoluciones
+    image: tienda-ms-devoluciones
+    container_name: ms-devoluciones
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      api-gateway:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SERVER_PORT: 9009
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-rdbms:5432/devoluciones
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: "123"
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-broker:29092
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+    networks:
+      - tienda-network
+
+  ms-soporte:
+    build: ./ms-soporte
+    image: tienda-ms-soporte
+    container_name: ms-soporte
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      api-gateway:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SERVER_PORT: 9010
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-rdbms:5432/soporte
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: "123"
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-broker:29092
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+    networks:
+      - tienda-network
+
+  ms-armado:
+    build: ./ms-armado
+    image: tienda-ms-armado
+    container_name: ms-armado
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      api-gateway:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SERVER_PORT: 9011
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-rdbms:5432/armado
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: "123"
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-broker:29092
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+    networks:
+      - tienda-network
+
+  ms-notificaciones:
+    build: ./ms-notificaciones
+    image: tienda-ms-notificaciones
+    container_name: ms-notificaciones
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      api-gateway:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SERVER_PORT: 9012
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-rdbms:5432/notificaciones
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: "123"
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-broker:29092
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+    networks:
+      - tienda-network
+# ============================================================
+# Red compartida con nombre fijo (independiente del nombre
+# de la carpeta del proyecto)
+# ============================================================
+networks:
+  tienda-network:
+    name: tienda-network
