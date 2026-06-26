@@ -162,51 +162,51 @@ goto MENU
 cls
 echo.
 echo ===== Compilando microservicios =====
-cd /d C:\tienda\ms-usuarios
+cd /d C:\SoftwareTiendaPcHardware\ms-usuarios
 
 call mvn clean install -U
 
-cd /d C:\tienda\ms-catalogo
+cd /d C:\SoftwareTiendaPcHardware\ms-catalogo
 
 call mvn clean install -U
 
-cd /d C:\tienda\ms-stock
+cd /d C:\SoftwareTiendaPcHardware\ms-stock
 
 call mvn clean install -U
 
-cd /d C:\tienda\ms-pedidos
+cd /d C:\SoftwareTiendaPcHardware\ms-pedidos
 
 call mvn clean install -U
 
-cd /d C:\tienda\ms-pagos
+cd /d C:\SoftwareTiendaPcHardware\ms-pagos
 
 call mvn clean install -U
 
-cd /d C:\tienda\ms-envios
+cd /d C:\SoftwareTiendaPcHardware\ms-envios
 
 call mvn clean install -U
 
-cd /d C:\tienda\ms-tasacion
+cd /d C:\SoftwareTiendaPcHardware\ms-tasacion
 
 call mvn clean install -U
 
-cd /d C:\tienda\ms-garantias
+cd /d C:\SoftwareTiendaPcHardware\ms-garantias
 
 call mvn clean install -U
 
-cd /d C:\tienda\ms-devoluciones
+cd /d C:\SoftwareTiendaPcHardware\ms-devoluciones
 
 call mvn clean install -U
 
-cd /d C:\tienda\ms-soporte
+cd /d C:\SoftwareTiendaPcHardware\ms-soporte
 
 call mvn clean install -U
 
-cd /d C:\tienda\ms-armado
+cd /d C:\SoftwareTiendaPcHardware\ms-armado
 
 call mvn clean install -U
 
-cd /d C:\tienda\ms-notificaciones
+cd /d C:\SoftwareTiendaPcHardware\ms-notificaciones
 
 call mvn clean install -U
 echo Compilacion completada.
@@ -221,31 +221,31 @@ echo.
 echo Eliminando carpeta .m2 ...
 rmdir /s /q %USERPROFILE%\.m2
 echo Eliminando carpetas target ...
-rmdir /s /q C:\tienda\eureka\target
+rmdir /s /q C:\SoftwareTiendaPcHardware\eureka\target
 
-rmdir /s /q C:\tienda\ms-usuarios\target
+rmdir /s /q C:\SoftwareTiendaPcHardware\ms-usuarios\target
 
-rmdir /s /q C:\tienda\ms-catalogo\target
+rmdir /s /q C:\SoftwareTiendaPcHardware\ms-catalogo\target
 
-rmdir /s /q C:\tienda\ms-stock\target
+rmdir /s /q C:\SoftwareTiendaPcHardware\ms-stock\target
 
-rmdir /s /q C:\tienda\ms-pedidos\target
+rmdir /s /q C:\SoftwareTiendaPcHardware\ms-pedidos\target
 
-rmdir /s /q C:\tienda\ms-pagos\target
+rmdir /s /q C:\SoftwareTiendaPcHardware\ms-pagos\target
 
-rmdir /s /q C:\tienda\ms-envios\target
+rmdir /s /q C:\SoftwareTiendaPcHardware\ms-envios\target
 
-rmdir /s /q C:\tienda\ms-tasacion\target
+rmdir /s /q C:\SoftwareTiendaPcHardware\ms-tasacion\target
 
-rmdir /s /q C:\tienda\ms-garantias\target
+rmdir /s /q C:\SoftwareTiendaPcHardware\ms-garantias\target
 
-rmdir /s /q C:\tienda\ms-devoluciones\target
+rmdir /s /q C:\SoftwareTiendaPcHardware\ms-devoluciones\target
 
-rmdir /s /q C:\tienda\ms-soporte\target
+rmdir /s /q C:\SoftwareTiendaPcHardware\ms-soporte\target
 
-rmdir /s /q C:\tienda\ms-armado\target
+rmdir /s /q C:\SoftwareTiendaPcHardware\ms-armado\target
 
-rmdir /s /q C:\tienda\ms-notificaciones\target
+rmdir /s /q C:\SoftwareTiendaPcHardware\ms-notificaciones\target
 echo Descargando dependencias nuevamente con Maven ...
 mvn clean install -U -DskipTests
 echo.
