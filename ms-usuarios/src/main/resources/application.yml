@@ -1,36 +1,29 @@
-server:
-  port: 0
-  error:
-    include-stacktrace: never
-# [SWAGGER-INI] 
-# Configuración de SpringDoc/Swagger UI
-springdoc:
-  api-docs:
-    path: /v3/api-docs
-  swagger-ui:
-    path: /swagger-ui.html
-# [SWAGGER-FIN] 
+# =============================================================
+# MS-USUARIOS - Configuracion principal
+# =============================================================
+# Este microservicio gestiona los usuarios del sistema.
+# Se registra en Eureka para que otros MS puedan encontrarlo
+# sin necesidad de conocer su IP o puerto directamente.
+# =============================================================
 
 spring:
   application:
     name: ms-usuarios
+  profiles:
+    active: dev
+  kafka:
+    bootstrap-servers: localhost:9092
+  
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5433/usuarios
     username: postgres
     password: 123
   jpa:
-    hibernate:
-      ddl-auto: update
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-  kafka:
-    bootstrap-servers: localhost:9092
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      properties:
-        "spring.json.add.type.headers": false
+    # dd-auto va en cada perfil porque su valor cambia entre dev y prod
+
 # [JJWT-INI]
 # ── Configuración JWT ──────────────────────────────────────────
 # Esta clave secreta DEBE ser idéntica en todos los microservicios
@@ -42,14 +35,165 @@ jwt:
   secret: "dG9rZW5TZWNyZXRLZXlTb2Z0d2FyZVRpZW5kYTIwMjZQY0hhcmR3YXJlU2VjdXJpdHk="
   expiration-ms: 3600000   # 1 hora en milisegundos
 # [JJWT-FIN]
+
+server:
+  # Al poner "0", el puerto se asignará dinámicamente para evitar conflictos de ejecutar multiples instancias
+  port: 0
+  error:
+    include-stacktrace: never
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger.ui.html
+
 eureka:
   client:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: htttp://localhost:8761/eureka
+    instance:
+      prefer-ip-address: true
+      instance-id: "${spring.application.name}:${random.value}"
+      lease-renewal-interval-in-seconds: 15
+      lease-expiration-duration-in-seconds: 60
+
+management:
+  info:
+      env:
+        enabled: true
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+
+info:
+  app:
+    name: ${spring.application.name}
+    version: "@project.version@"
+    description: "Microservicio de gestión de usuarios del sistema"
+
+# ════════════════════════════════════════════════════════════
+# PERFIL: Desarrollo (tu PC local)
+# ════════════════════════════════════════════════════════════
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+      innclude: health, info, metrics, env, loggers
+
+# ════════════════════════════════════════════════════════════
+# PERFIL: Producción (servidor real)
+# ════════════════════════════════════════════════════════════
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+      show-sql: false
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://eureka-server:8761/eureka}
   instance:
-    prefer-ip-address: true
-    instance-id: "${spring.application.name}:${random.value}"
-    lease-renewal-interval-in-seconds: 15
-    lease-expiration-duration-in-seconds: 60
+    lease-renewal-interval-in-seconds: 30
+    lease-expiration-duration-in-seconds: 90
+
+management:
+  endpoint:
+    health:
+      show-details: when-authorized
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+
+
+
+
+
+# server:
+#   port: 0
+#   error:
+#     include-stacktrace: never
+# # [SWAGGER-INI] 
+# # Configuración de SpringDoc/Swagger UI
+# springdoc:
+#   api-docs:
+#     path: /v3/api-docs
+#   swagger-ui:
+#     path: /swagger-ui.html
+# # [SWAGGER-FIN] 
+
+# spring:
+#   application:
+#     name: ms-usuarios
+#   datasource:
+#     driver-class-name: org.postgresql.Driver
+#     url: jdbc:postgresql://localhost:5433/usuarios
+#     username: postgres
+#     password: 123
+#   jpa:
+#     hibernate:
+#       ddl-auto: update
+#     database: postgresql
+#     database-platform: org.hibernate.dialect.PostgreSQLDialect
+#   kafka:
+#     bootstrap-servers: localhost:9092
+#     producer:
+#       key-serializer: org.apache.kafka.common.serialization.StringSerializer
+#       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+#       properties:
+#         "spring.json.add.type.headers": false
+# # [JJWT-INI]
+# # ── Configuración JWT ──────────────────────────────────────────
+# # Esta clave secreta DEBE ser idéntica en todos los microservicios
+# # para que los tokens generados por ms-usuarios sean válidos en
+# # ms-catalogo y ms-recursos.
+# # Para dar el valor al "secret" trasformaremos la frase clave (inventada) 
+# # "tokenSecretKeySoftwareTienda2026PcHardwareSecurity" a formato Base64
+# jwt:
+#   secret: "dG9rZW5TZWNyZXRLZXlTb2Z0d2FyZVRpZW5kYTIwMjZQY0hhcmR3YXJlU2VjdXJpdHk="
+#   expiration-ms: 3600000   # 1 hora en milisegundos
+# # [JJWT-FIN]
+# eureka:
+#   client:
+#     register-with-eureka: true
+#     fetch-registry: true
+#     service-url:
+#       defaultZone: http://localhost:8761/eureka
+#   instance:
+#     prefer-ip-address: true
+#     instance-id: "${spring.application.name}:${random.value}"
+#     lease-renewal-interval-in-seconds: 15
+#     lease-expiration-duration-in-seconds: 60
