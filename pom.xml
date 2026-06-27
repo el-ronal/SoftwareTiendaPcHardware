@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <!-- Modelo base de Maven -->
     <modelVersion>4.0.0</modelVersion>
@@ -70,6 +70,7 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <maven-clean-plugin.version>3.3.1</maven-clean-plugin.version>
+        <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <cl-pchardware-common.version>0.0.1-SNAPSHOT</cl-pchardware-common.version>
         <spring-kafka.version>3.3.5</spring-kafka.version>
         <spring-boot-actuator.version>3.5.14</spring-boot-actuator.version>
@@ -278,7 +279,23 @@
                 </executions>
             </plugin>
 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+            </plugin>
         </plugins>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <excludes>
+                    <exclude>**/*.jks</exclude>
+                    <exclude>**/*.p12</exclude>
+                </excludes>
+            </resource>
+        </resources>
     </build>
 
 </project>
